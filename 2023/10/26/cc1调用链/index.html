@@ -1,208 +1,703 @@
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
   
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="pow1e">
+  <meta name="keywords" content="">
   
-  <title>cc1调用链 | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="article">
+    <meta name="description" content="1. 配置环境：cc1调用链需要环境如下:  jdk1.8.0_65 commons-collections 版本号为3.2.1 jdk1.8_65源码   下载jdk 8u65 Oracle JDK 8u65 全平台安装包下载 - 码霸霸 (lupf.cn) 导入坐标如下  12345&lt;dependency&gt;    &lt;groupId&gt;commons-collections">
+<meta property="og:type" content="article">
 <meta property="og:title" content="cc1调用链">
 <meta property="og:url" content="http://example.com/2023/10/26/cc1%E8%B0%83%E7%94%A8%E9%93%BE/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="pow1e的知识小屋">
+<meta property="og:description" content="1. 配置环境：cc1调用链需要环境如下:  jdk1.8.0_65 commons-collections 版本号为3.2.1 jdk1.8_65源码   下载jdk 8u65 Oracle JDK 8u65 全平台安装包下载 - 码霸霸 (lupf.cn) 导入坐标如下  12345&lt;dependency&gt;    &lt;groupId&gt;commons-collections">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/blog_image/image-20231023230226781-1698124632828-1.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231023230454765.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231023230819092.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026162650565.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026162832837.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026162954726.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026170328365.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026172019179.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026172425292.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026172616941.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026174119500.png">
+<meta property="og:image" content="http://example.com/blog_image/image-20231026174331664.png">
 <meta property="article:published_time" content="2023-10-26T11:41:32.000Z">
-<meta property="article:modified_time" content="2023-10-26T11:41:32.148Z">
-<meta property="article:author" content="John Doe">
-<meta name="twitter:card" content="summary">
-  
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
-  
-  
-    <link rel="shortcut icon" href="/favicon.png">
+<meta property="article:modified_time" content="2023-10-26T11:47:49.500Z">
+<meta property="article:author" content="pow1e">
+<meta property="article:tag" content="java安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/blog_image/image-20231023230226781-1698124632828-1.png">
   
   
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+  
+  <title>cc1调用链 - pow1e的知识小屋</title>
 
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
-  
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
 
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
   
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
   
 <meta name="generator" content="Hexo 6.3.0"></head>
 
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-        
-          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
-        
-        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-
-      <div class="outer">
-        <section id="main"><article id="post-cc1调用链" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/10/26/cc1%E8%B0%83%E7%94%A8%E9%93%BE/" class="article-date">
-  <time class="dt-published" datetime="2023-10-26T11:41:32.000Z" itemprop="datePublished">2023-10-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      cc1调用链
-    </h1>
   
 
-      </header>
+  <header>
     
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/10/26/cc1%E8%B0%83%E7%94%A8%E9%93%BE/" data-id="clo746emb0001rctnck0t6071" data-title="cc1调用链" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
-  
-    
-<nav id="article-nav">
-  
-  
-    <a href="/2023/10/26/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pow1e的知识小屋</strong>
     </a>
-  
-</nav>
 
-  
-</article>
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
 
-
-</section>
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
         
-          <aside id="sidebar">
-  
-    
-
-  
-    
-
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">October 2023</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
         
-          <li>
-            <a href="/2023/10/26/cc1%E8%B0%83%E7%94%A8%E9%93%BE/">cc1调用链</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
           </li>
+          
         
-          <li>
-            <a href="/2023/10/26/hello-world/">Hello World</a>
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
           </li>
         
       </ul>
     </div>
   </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-      &copy; 2023 John Doe<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
 </nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="cc1调用链"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-26 19:41" pubdate>
+          2023年10月26日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.6k 字
+        
+      </span>
     
 
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 分钟
+        
+      </span>
+    
 
-<script src="/js/jquery-3.6.4.min.js"></script>
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">cc1调用链</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="1-配置环境："><a href="#1-配置环境：" class="headerlink" title="1. 配置环境："></a>1. 配置环境：</h1><p>cc1调用链需要环境如下:</p>
+<ul>
+<li>jdk1.8.0_65</li>
+<li>commons-collections 版本号为<code>3.2.1</code></li>
+<li><a target="_blank" rel="noopener" href="https://hg.openjdk.org/jdk8u/jdk8u/jdk/archive/af660750b2f4.zip">jdk1.8_65源码</a></li>
+</ul>
+<ol>
+<li>下载<code>jdk 8u65</code> <a target="_blank" rel="noopener" href="https://blog.lupf.cn/articles/2022/02/19/1645283454543.html">Oracle JDK 8u65 全平台安装包下载 - 码霸霸 (lupf.cn)</a></li>
+<li>导入坐标如下</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>commons-collections<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>commons-collections<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.2.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>解压jdk1.8.0_65下是src文件，将jdk1.8.0_65源码中的<code>src/share/clasess/sun</code>添加到你配置的1.8.0_65中的<code>src</code>目录中。</li>
+</ol>
+<p>教程：</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1no4y1U7E1/?spm_id_from=333.999.0.0&vd_source=a015846fd4dda3664f6a3becf9028a53">Java反序列化CommonsCollections篇(一) CC1链手写EXP_哔哩哔哩_bilibili</a></p>
+<h1 id="2-思路："><a href="#2-思路：" class="headerlink" title="2. 思路："></a>2. 思路：</h1><p><img src="/./../blog_image/image-20231023230226781-1698124632828-1.png" srcset="/img/loading.gif" lazyload alt="image-20231023230226781"></p>
+<p>从调用危险方法到调用顶层<code>readObeject</code>实现反序列化</p>
+<h1 id="3-探索："><a href="#3-探索：" class="headerlink" title="3. 探索："></a>3. 探索：</h1><h2 id="3-1-简单找个危险函数："><a href="#3-1-简单找个危险函数：" class="headerlink" title="3.1 简单找个危险函数："></a>3.1 简单找个危险函数：</h2><h3 id="突破口-transform方法："><a href="#突破口-transform方法：" class="headerlink" title="- 突破口 transform方法："></a>- 突破口 transform方法：</h3><p>找到一个接口，查看他的实现类</p>
+<p><img src="/./../blog_image/image-20231023230454765.png" srcset="/img/loading.gif" lazyload alt="image-20231023230454765"></p>
+<p>找到一个<code>InvokerTranformer</code>类的<code>transform</code>方法，接收参数是可控的，即获取了当前传入obejct类，然后调用反射去调用成员变量的函数名和函数参数，找到他的构造函数	</p>
+<p><img src="/./../blog_image/image-20231023230819092.png" srcset="/img/loading.gif" lazyload alt="image-20231023230819092"></p>
+<p>第一个参数是方法名，第二个参数是参数类型，第三个参数是参数值。我们通过构造函数然后去调用<code>transform</code>方法即可调用我们传入类的方法了。</p>
+<p>我们任意调用的方法是这样的<code>Runtime.getRuntime().exec(&quot;calc&quot;);</code>这里使用<code>InvokerTransformer</code>就是这样：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">Runtime</span> <span class="hljs-variable">runtime</span> <span class="hljs-operator">=</span> Runtime.getRuntime();<br><span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>        .transform(runtime);<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="解决Runtime不能反序列化"><a href="#解决Runtime不能反序列化" class="headerlink" title="- 解决Runtime不能反序列化"></a>- 解决Runtime不能反序列化</h3><p>找到突破口之后，我们要想<code>readObject</code>方法是反序列化才会使用，但是<code>Runtime</code>没有实现<code>SSerializable</code>方法，因此不能实现反序列化。</p>
+<p>如何解决？Class类都是可序列化的，因此我们序列化<code>Runtime.class</code>。</p>
+<p>查看源码发现，<code>Runtime</code>类的构造方法都是私有的，只有一个静态方法<code>getRuntime</code>返回<code>currentRuntime</code>，用到的是单例模式。因此只能反射调用<code>getRuntime</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// InvokerTransformer 传入形参会通过反射进行调用</span><br>Class&lt;Runtime&gt; runtimeClass = Runtime.class;<br><span class="hljs-type">Method</span> <span class="hljs-variable">runtimeClassMethod</span> <span class="hljs-operator">=</span> runtimeClass.getMethod(<span class="hljs-string">&quot;getRuntime&quot;</span>);<br><span class="hljs-type">Runtime</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> (Runtime) runtimeClassMethod.invoke(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>runtimeClass.getMethod(<span class="hljs-string">&quot;exec&quot;</span>, String.class).invoke(r, <span class="hljs-string">&quot;calc&quot;</span>);<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>首先获取Runtime.class这个class对象</li>
+<li>然后调用<code>getRuntime</code>静态方法获取当前的<code>runtimeClassMethod</code>方法。</li>
+<li>然后使用<code>runtimeClassMethod</code>方法类去<code>invoke</code>，即调用<code>getRuntime</code>方法，<code>invoke</code>方法第一个参数是类的实例对象，第二个参数是这个方法执行的参数。因为需要<code>Runtime</code>类才能调用这个私有方法，因此第一个参数是我们上面获取到的对象。</li>
+</ul>
+<h2 id="3-2-TransformedMap类："><a href="#3-2-TransformedMap类：" class="headerlink" title="3.2 TransformedMap类："></a>3.2 TransformedMap类：</h2><p>上面我们查找到了调用<code>TransformedMap</code>类中的<code>checkSetValue</code>方法，我们接着网上找，发现<code>AbstractInputCheckedMapDecorator</code>类中的内部类<code>MapEntry</code>的<code>setValue</code>方法调用了他，只要我们执行map的<code>setValue</code>将我们上面的<code>Object Input</code>传入进去就可以执行了，如下：</p>
+<p><img src="/./../blog_image/image-20231026162650565.png" srcset="/img/loading.gif" lazyload alt="image-20231026162650565"></p>
+<p>发现是<code>AbstractInputCheckedMapDecorator</code>中的<code>MapEntry</code>的<code>setValue</code>方法。</p>
+<p><img src="/./../blog_image/image-20231026162832837.png" srcset="/img/loading.gif" lazyload alt="image-20231026162832837"></p>
+<p>编写构造链如图所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">TransformedMapExp02</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// TransformedMap 这个类继承AbstractInputCheckedMapDecorator类 重写了checkSetValue 方法</span><br>    <span class="hljs-comment">// AbstractInputCheckedMapDecorator 类中的一个匿名MapEntry类调用setValue方法 回调用checkSetValue</span><br>    <span class="hljs-comment">// 尝试调用MapEntry的set方法</span><br>    <span class="hljs-type">Runtime</span> <span class="hljs-variable">runtime</span> <span class="hljs-operator">=</span> Runtime.getRuntime();<br>    <span class="hljs-type">InvokerTransformer</span> <span class="hljs-variable">invokerTransformer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">InvokerTransformer</span>(<span class="hljs-string">&quot;exec&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;String.class&#125;, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;);<br>    HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>    map.put(<span class="hljs-string">&quot;aa&quot;</span>,<span class="hljs-string">&quot;bb&quot;</span>);<br>    Map&lt;Object,Object&gt; transformedMap = TransformedMap.decorate(map, <span class="hljs-literal">null</span>, invokerTransformer);<br>    <span class="hljs-keyword">for</span> (Map.Entry entry : transformedMap.entrySet()) &#123;<br>        entry.setValue(runtime);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>继续网上查询，查找谁调用了<code>setValue()</code>方法，发现存在许多方法，我们的目的是查找<code>readObejct</code>方法，在<code>readObejct</code>方法中调用<code>setValue()</code>方法既可以实现放序列化，查找到<code>sun.reflect.annotation</code>包中的<code>AnnotationInnvocationHandler</code>的<code>readObejct</code>方法调用了<code>AbstractInputCheckedMapDecorator</code>中的<code>setVale()</code>方法。</p>
+<p><img src="/./../blog_image/image-20231026162954726.png" srcset="/img/loading.gif" lazyload alt="image-20231026162954726"></p>
+<p>至此调用链就清楚了：</p>
+<p><img src="/./../blog_image/image-20231026170328365.png" srcset="/img/loading.gif" lazyload alt="image-20231026170328365"></p>
+<p><code>readObjetc</code>中的判断如下：</p>
+<p><img src="/./../blog_image/image-20231026172019179.png" srcset="/img/loading.gif" lazyload alt="image-20231026172019179"></p>
+<ol>
+<li>将我们的map的key设置为一个注解中的成员变量，如<code>Target</code>注解存在一个成员变量<code>value</code>。</li>
+</ol>
+<p><img src="/./../blog_image/image-20231026172425292.png" srcset="/img/loading.gif" lazyload alt="image-20231026172425292"></p>
+<p>然后创建一个代理对象，去调用了我们熟悉的<code>AbstractInputCheckedMapDecorator</code>的<code>setValue</code>方法。</p>
+<p><img src="/./../blog_image/image-20231026172616941.png" srcset="/img/loading.gif" lazyload alt="image-20231026172616941"></p>
+<p>因此思路在于如何修改这个<code>parent</code>对象的属性，可以没有办法。查找其他<code>transform</code>发现<code>ConstantTransformer</code>中<code>transform</code>不管输入什么都是调用他的成员变量，因此可以只要我们在创建的时候将<code>Runtime.class</code>赋值给他的成员变量，然后去调用<code>transform</code>方法就会返回<code>Runtime.class</code></p>
+<h1 id="4-疑惑："><a href="#4-疑惑：" class="headerlink" title="4. 疑惑："></a>4. 疑惑：</h1><h2 id="4-1-疑惑点一：为什么要加上new-ConstantTransformer-Runtime-class-？"><a href="#4-1-疑惑点一：为什么要加上new-ConstantTransformer-Runtime-class-？" class="headerlink" title="4.1 疑惑点一：为什么要加上new ConstantTransformer(Runtime.class)？"></a>4.1 疑惑点一：为什么要加上new ConstantTransformer(Runtime.class)？</h2><p>开始我们知道使用chainedTransformer中的<code>transfomer</code>方法可以方便我们去调用，我们传入多个对象就会不断循环去调用这些对象的<code>transfomer</code>方法。</p>
+<p>如图：</p>
+<p><img src="/./../blog_image/image-20231026174119500.png" srcset="/img/loading.gif" lazyload alt="image-20231026174119500"></p>
+<p>我们只要将我们需要传入的<code>Runtime.class</code>就可以实现我们的链路了。</p>
+<p><img src="/./../blog_image/image-20231026174331664.png" srcset="/img/loading.gif" lazyload alt="image-20231026174331664"></p>
+<h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><ul>
+<li>视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1no4y1U7E1/?spm_id_from=333.999.0.0&vd_source=a015846fd4dda3664f6a3becf9028a53">Java反序列化CommonsCollections篇(一) CC1链手写EXP_哔哩哔哩_bilibili</a></li>
+<li>博客：<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/h0cksr/p/16189755.html">java反序列化(三)CommonsCollections篇 – CC1 - h0cksr - 博客园 (cnblogs.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45808483/article/details/122743960">【精选】Java安全入门(二)——CC链1 分析+详解_cc1利用链_ErYao7的博客-CSDN博客</a></li>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/12669">JAVA安全初探(三):CC1链全分析 - 先知社区 (aliyun.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://drun1baby.top/2022/06/06/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Commons-Collections%E7%AF%8701-CC1%E9%93%BE/">Java反序列化Commons-Collections篇01-CC1链 | Drunkbaby’s Blog (drun1baby.top)</a></li>
+</ul>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/java%E5%AE%89%E5%85%A8/" class="print-no-link">#java安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>cc1调用链</div>
+      <div>http://example.com/2023/10/26/cc1调用链/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>pow1e</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月26日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
 
 
 
   
-<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
 
 
 
 
-<script src="/js/script.js"></script>
 
 
 
+    
 
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
 
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
   </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>
