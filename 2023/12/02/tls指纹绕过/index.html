@@ -1,0 +1,835 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="pow1e">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="浏览器可以正常访问，但是用requests发送请求失败。 后端是如何监测得呢？为什么浏览器可以返回结果，而requests模块不行呢？ https:&#x2F;&#x2F;cn.investing.com&#x2F;equities&#x2F;amazon-com-inc-historical-data   1.指纹校验案例1.1 案例：ascii2dhttps:&#x2F;&#x2F;ascii2d.net&#x2F;   1234567import reques">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tls指纹绕过">
+<meta property="og:url" content="https://pow1e.github.io/2023/12/02/tls%E6%8C%87%E7%BA%B9%E7%BB%95%E8%BF%87/index.html">
+<meta property="og:site_name" content="pow1e的知识小屋">
+<meta property="og:description" content="浏览器可以正常访问，但是用requests发送请求失败。 后端是如何监测得呢？为什么浏览器可以返回结果，而requests模块不行呢？ https:&#x2F;&#x2F;cn.investing.com&#x2F;equities&#x2F;amazon-com-inc-historical-data   1.指纹校验案例1.1 案例：ascii2dhttps:&#x2F;&#x2F;ascii2d.net&#x2F;   1234567import reques">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102222853489.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102222951995.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102152118149.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102152223565.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102222853489.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102222951995.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102152648185.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102152734717.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102160720074.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102160648459.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102162717583.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102162114984.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102162435891.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102162148914.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102154253441.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102165413527.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102171445727.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102171555206.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102174433762.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102173836479.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102174113014.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231102182216117.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20231103184851991.png">
+<meta property="article:published_time" content="2023-12-02T15:42:08.000Z">
+<meta property="article:modified_time" content="2023-12-02T15:50:46.536Z">
+<meta property="article:author" content="pow1e">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pow1e.github.io/blog_image/image-20231102222853489.png">
+  
+  
+  
+  <title>tls指纹绕过 - pow1e的知识小屋</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"pow1e.github.io","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pow1e的知识小屋</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="tls指纹绕过"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-02 23:42" pubdate>
+          2023年12月2日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          77 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">tls指纹绕过</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>浏览器可以正常访问，但是用requests发送请求失败。</p>
+<p>后端是如何监测得呢？为什么浏览器可以返回结果，而requests模块不行呢？</p>
+<p><a target="_blank" rel="noopener" href="https://cn.investing.com/equities/amazon-com-inc-historical-data">https://cn.investing.com/equities/amazon-com-inc-historical-data</a></p>
+<p><img src="/./../blog_image/image-20231102222853489.png" srcset="/img/loading.gif" lazyload alt="image-20231102222853489"></p>
+<p><img src="/./../blog_image/image-20231102222951995.png" srcset="/img/loading.gif" lazyload alt="image-20231102222951995"></p>
+<h1 id="1-指纹校验案例"><a href="#1-指纹校验案例" class="headerlink" title="1.指纹校验案例"></a>1.指纹校验案例</h1><h2 id="1-1-案例：ascii2d"><a href="#1-1-案例：ascii2d" class="headerlink" title="1.1 案例：ascii2d"></a>1.1 案例：ascii2d</h2><p><a target="_blank" rel="noopener" href="https://ascii2d.net/">https://ascii2d.net/</a></p>
+<p><img src="/./../blog_image/image-20231102152118149.png" srcset="/img/loading.gif" lazyload alt="image-20231102152118149"></p>
+<p><img src="/./../blog_image/image-20231102152223565.png" srcset="/img/loading.gif" lazyload alt="image-20231102152223565"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><br>res = requests.get(<br>    url=<span class="hljs-string">&quot;https://ascii2d.net&quot;</span><br>)<br><br><span class="hljs-built_in">print</span>(res.text)<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en-US&quot;</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Just a moment...<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">http-equiv</span>=<span class="hljs-string">&quot;Content-Type&quot;</span> <span class="hljs-attr">content</span>=<span class="hljs-string">&quot;text/html; charset=UTF-8&quot;</span> /&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br>   ...<br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="1-2-案例：investing"><a href="#1-2-案例：investing" class="headerlink" title="1.2 案例：investing"></a>1.2 案例：investing</h2><p><a target="_blank" rel="noopener" href="https://cn.investing.com/equities/amazon-com-inc-historical-data">https://cn.investing.com/equities/amazon-com-inc-historical-data</a></p>
+<p><img src="/./../blog_image/image-20231102222853489.png" srcset="/img/loading.gif" lazyload alt="image-20231102222853489"></p>
+<p><img src="/./../blog_image/image-20231102222951995.png" srcset="/img/loading.gif" lazyload alt="image-20231102222951995"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><br>res = requests.get(<br>    url=<span class="hljs-string">&quot;https://cn.investing.com/equities/amazon-com-inc-historical-data&quot;</span>,<br>    headers=&#123;<br>        <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36&#x27;</span>,<br>    &#125;<br>)<br>res.encoding = <span class="hljs-string">&#x27;utf-8&#x27;</span><br><span class="hljs-built_in">print</span>(res.text)<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="1-3-案例：yuanrenxue"><a href="#1-3-案例：yuanrenxue" class="headerlink" title="1.3 案例：yuanrenxue"></a>1.3 案例：yuanrenxue</h2><p><img src="/./../blog_image/image-20231102152648185.png" srcset="/img/loading.gif" lazyload alt="image-20231102152648185"></p>
+<p><img src="/./../blog_image/image-20231102152734717.png" srcset="/img/loading.gif" lazyload alt="image-20231102152734717"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><br>res = requests.get(<br>    url=<span class="hljs-string">&quot;https://match.yuanrenxue.cn/api/match/19?page=1&quot;</span><br>)<br><br><span class="hljs-built_in">print</span>(res.text)<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+<h1 id="2-TLS指纹"><a href="#2-TLS指纹" class="headerlink" title="2.TLS指纹"></a>2.TLS指纹</h1><p>如今几乎所有平台通信都是基于Https的协议，而无论基于什么工具去发送Https请求时，都需要基于TLS&#x2F;SSL先建立两端安全的通信（握手），建立后再进行数据传输。</p>
+<p>TLS的握手阶段，客户端会向服务端发送 Client Hello 数据包，在数据包内的<code>JA3</code>就是指纹信息（基于电脑的TLS版本+内置算法等计算出来的字符串），并且该值不会随着请求头修改、代理等发生变化。所以，某个网站的后台就会去读取TLS客户端的<code>JA3</code>指纹，如果是非正常指纹，禁止访问。例如：</p>
+<ul>
+<li><p>requests请求</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">requests</span><span class="hljs-operator">=</span><span class="hljs-operator">=</span><span class="hljs-number">2.31</span>.<span class="hljs-number">0</span><br><span class="hljs-attribute">urllib3</span><span class="hljs-operator">=</span><span class="hljs-operator">=</span><span class="hljs-number">2.0</span>.<span class="hljs-number">7</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs subunit">[JA3 Fullstring: 771,4866<span class="hljs-string">-4867</span><span class="hljs-string">-4865</span><span class="hljs-string">-49196</span><span class="hljs-string">-49200</span><span class="hljs-string">-159</span><span class="hljs-string">-52393</span><span class="hljs-string">-52392</span><span class="hljs-string">-52394</span><span class="hljs-string">-49195</span><span class="hljs-string">-49199</span><span class="hljs-string">-158</span><span class="hljs-string">-49188</span><span class="hljs-string">-49192</span><span class="hljs-string">-107</span><span class="hljs-string">-49187</span><span class="hljs-string">-49191</span><span class="hljs-string">-103</span><span class="hljs-string">-49162</span><span class="hljs-string">-49172</span><span class="hljs-string">-57</span><span class="hljs-string">-49161</span><span class="hljs-string">-49171</span><span class="hljs-string">-51</span><span class="hljs-string">-157</span><span class="hljs-string">-156</span><span class="hljs-string">-61</span><span class="hljs-string">-60</span><span class="hljs-string">-53</span><span class="hljs-string">-47</span><span class="hljs-string">-255</span>,0<span class="hljs-string">-11</span><span class="hljs-string">-10</span><span class="hljs-string">-16</span><span class="hljs-string">-22</span><span class="hljs-string">-23</span><span class="hljs-string">-49</span><span class="hljs-string">-13</span><span class="hljs-string">-43</span><span class="hljs-string">-45</span><span class="hljs-string">-51</span><span class="hljs-string">-21</span>,29<span class="hljs-string">-23</span><span class="hljs-string">-30</span><span class="hljs-string">-25</span><span class="hljs-string">-24</span>,0<span class="hljs-string">-1</span><span class="hljs-string">-2</span>]<br><br>[JA3: bc29aa426fc99c0be1b9be941869f88a]<br><br>固定，所以后端API可以禁止此指纹。<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>浏览器请求</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs subunit">[JA3 Fullstring: 771,4865<span class="hljs-string">-4866</span><span class="hljs-string">-4867</span><span class="hljs-string">-49195</span><span class="hljs-string">-49199</span><span class="hljs-string">-49196</span><span class="hljs-string">-49200</span><span class="hljs-string">-52393</span><span class="hljs-string">-52392</span><span class="hljs-string">-49171</span><span class="hljs-string">-49172</span><span class="hljs-string">-156</span><span class="hljs-string">-157</span><span class="hljs-string">-47</span><span class="hljs-string">-53</span>,11<span class="hljs-string">-18</span><span class="hljs-string">-27</span><span class="hljs-string">-35</span><span class="hljs-string">-16</span><span class="hljs-string">-51</span><span class="hljs-string">-10</span><span class="hljs-string">-23</span><span class="hljs-string">-5</span><span class="hljs-string">-43</span><span class="hljs-string">-65281</span><span class="hljs-string">-65037</span><span class="hljs-string">-0</span><span class="hljs-string">-17513</span><span class="hljs-string">-13</span><span class="hljs-string">-45</span>,29<span class="hljs-string">-23</span><span class="hljs-string">-24</span>,0]<br><br>[JA3: 5ae2fe79293ec63d585f3f987cf69d01]<br><br>谷歌浏览器的JA3会变化。<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>扩展：有些网站专门收录ja3黑名单。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs awk">https:<span class="hljs-regexp">//</span>sslbl.abuse.ch<span class="hljs-regexp">/ja3-fingerprints/</span><br>https:<span class="hljs-regexp">//</span>sslbl.abuse.ch<span class="hljs-regexp">/blacklist/</span>sslblacklist.csv<br>https:<span class="hljs-regexp">//gi</span>thub.com<span class="hljs-regexp">/salesforce/</span>ja3<span class="hljs-regexp">/blob/m</span>aster<span class="hljs-regexp">/lists/</span>osx-nix-ja3.csv<br>https:<span class="hljs-regexp">//</span>ja3er.com/getAllUasJson<br>https:<span class="hljs-regexp">//</span>ja3er.com/getAllHashesJson<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="2-1-查看指纹"><a href="#2-1-查看指纹" class="headerlink" title="2.1 查看指纹"></a>2.1 查看指纹</h2><p>想要快速查看自己的TSL指纹信息：<a target="_blank" rel="noopener" href="https://tls.browserleaks.com/json">https://tls.browserleaks.com/json</a></p>
+<p><img src="/./../blog_image/image-20231102160720074.png" srcset="/img/loading.gif" lazyload alt="image-20231102160720074"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><br>res = requests.get(<span class="hljs-string">&#x27;https://tls.browserleaks.com/json&#x27;</span>)<br><span class="hljs-built_in">print</span>(res.text)<br></code></pre></td></tr></table></figure>
+
+<p><img src="/./../blog_image/image-20231102160648459.png" srcset="/img/loading.gif" lazyload alt="image-20231102160648459"></p>
+<p>其他网站还有：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">https:</span><span class="hljs-comment">//tls.browserleaks.com/json</span><br><span class="hljs-symbol">https:</span><span class="hljs-comment">//tls.peet.ws/</span><br><span class="hljs-symbol">https:</span><span class="hljs-comment">//tls.peet.ws/api/all</span><br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h2 id="2-2-Wireshark"><a href="#2-2-Wireshark" class="headerlink" title="2.2 Wireshark"></a>2.2 Wireshark</h2><p>基于Wireshark抓包并筛选出Client Hello数据包，去内部查看：</p>
+<h3 id="1-下载安装"><a href="#1-下载安装" class="headerlink" title="1.下载安装"></a>1.下载安装</h3><p>下载并安装Wireshark  <a target="_blank" rel="noopener" href="https://www.wireshark.org/download.html">https://www.wireshark.org/download.html</a></p>
+<p><img src="/./../blog_image/image-20231102162717583.png" srcset="/img/loading.gif" lazyload alt="image-20231102162717583"></p>
+<h3 id="2-抓网卡"><a href="#2-抓网卡" class="headerlink" title="2.抓网卡"></a>2.抓网卡</h3><p>打开Wireshark，选择要抓包监测的网卡，选择你上网使用的那个网卡。</p>
+<p><img src="/./../blog_image/image-20231102162114984.png" srcset="/img/loading.gif" lazyload alt="image-20231102162114984"></p>
+<h3 id="3-筛选IP"><a href="#3-筛选IP" class="headerlink" title="3.筛选IP"></a>3.筛选IP</h3><p>筛选目标IP <code>ip.dst_host==146.56.195.149</code></p>
+<p><img src="/./../blog_image/image-20231102162435891.png" srcset="/img/loading.gif" lazyload alt="image-20231102162435891"></p>
+<p><img src="/./../blog_image/image-20231102162148914.png" srcset="/img/loading.gif" lazyload alt="image-20231102162148914"></p>
+<h3 id="4-数据包"><a href="#4-数据包" class="headerlink" title="4.数据包"></a>4.数据包</h3><p>用浏览器或用requests发送请求，就可以监测到网络请求，然后找到 <code>Client Hello</code>数据包，就可以看到相关指纹信息。</p>
+<p><img src="/./../blog_image/image-20231102154253441.png" srcset="/img/loading.gif" lazyload alt="image-20231102154253441"></p>
+<h2 id="2-3-ja3"><a href="#2-3-ja3" class="headerlink" title="2.3 ja3"></a>2.3 ja3</h2><p><img src="/./../blog_image/image-20231102165413527.png" srcset="/img/loading.gif" lazyload alt="image-20231102165413527"></p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs subunit">[JA3 Fullstring: 771,4866<span class="hljs-string">-4867</span><span class="hljs-string">-4865</span><span class="hljs-string">-49196</span><span class="hljs-string">-49200</span><span class="hljs-string">-159</span><span class="hljs-string">-52393</span><span class="hljs-string">-52392</span><span class="hljs-string">-52394</span><span class="hljs-string">-49195</span><span class="hljs-string">-49199</span><span class="hljs-string">-158</span><span class="hljs-string">-49188</span><span class="hljs-string">-49192</span><span class="hljs-string">-107</span><span class="hljs-string">-49187</span><span class="hljs-string">-49191</span><span class="hljs-string">-103</span><span class="hljs-string">-49162</span><span class="hljs-string">-49172</span><span class="hljs-string">-57</span><span class="hljs-string">-49161</span><span class="hljs-string">-49171</span><span class="hljs-string">-51</span><span class="hljs-string">-157</span><span class="hljs-string">-156</span><span class="hljs-string">-61</span><span class="hljs-string">-60</span><span class="hljs-string">-53</span><span class="hljs-string">-47</span><span class="hljs-string">-255</span>,0<span class="hljs-string">-11</span><span class="hljs-string">-10</span><span class="hljs-string">-16</span><span class="hljs-string">-22</span><span class="hljs-string">-23</span><span class="hljs-string">-49</span><span class="hljs-string">-13</span><span class="hljs-string">-43</span><span class="hljs-string">-45</span><span class="hljs-string">-51</span><span class="hljs-string">-21</span>,29<span class="hljs-string">-23</span><span class="hljs-string">-30</span><span class="hljs-string">-25</span><span class="hljs-string">-24</span>,0<span class="hljs-string">-1</span><span class="hljs-string">-2</span>]<br><br>[JA3: bc29aa426fc99c0be1b9be941869f88a]<br></code></pre></td></tr></table></figure>
+
+<p>关于加密相关的值：</p>
+<ul>
+<li><p><code>JA3</code> 是对 <code>JA3 Fullstring</code>进行md5加密的结果。</p>
+</li>
+<li><p><code>JA3 Fullstring</code>是由五段组成</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">JA3 gathers <span class="hljs-keyword">the</span> decimal values <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> <span class="hljs-keyword">bytes</span> <span class="hljs-keyword">for</span> <span class="hljs-keyword">the</span> following fields <span class="hljs-keyword">in</span> <span class="hljs-keyword">the</span> Client Hello packet; <br>	- SSL Version,<br>	- Accepted Ciphers<br>	- List <span class="hljs-keyword">of</span> Extensions<br>	- Elliptic Curves<br>	- Elliptic Curve Formats<br>It <span class="hljs-keyword">then</span> concatenates those values together <span class="hljs-keyword">in</span> order, <span class="hljs-keyword">using</span> <span class="hljs-keyword">a</span> <span class="hljs-string">&quot;,&quot;</span> <span class="hljs-built_in">to</span> delimit <span class="hljs-keyword">each</span> field <span class="hljs-keyword">and</span> <span class="hljs-keyword">a</span> <span class="hljs-string">&quot;-&quot;</span> <span class="hljs-built_in">to</span> delimit <span class="hljs-keyword">each</span> <span class="hljs-built_in">value</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">each</span> field.<br><br>JA3 为客户端发送的clienthello 数据包中的以下字段收集字节的十进制值: SSL Version, Accepted Ciphers, List <span class="hljs-keyword">of</span> Extensions, Elliptic Curves, <span class="hljs-keyword">and</span> Elliptic Curve Formats(SSL 版本、接受的密码、扩展列表、椭圆曲线和椭圆曲线格式)。然后它将这些值按顺序连接在一起，使用“，”分隔每个字段，使用“-”分隔每个字段中的每个值。<br><br><span class="hljs-keyword">https</span>://github.com/salesforce/ja3<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey"><span class="hljs-built_in">SSLVersion,</span> Cipher, SSLExtension, EllipticCurve, EllipticCurvePointFormat<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs subunit">第1个值：771                                   表示SSL版本，即：TLS 1.2（0x0303），0x0303转换为10进制就是771<br><br>第2个值：4866<span class="hljs-string">-4867</span><span class="hljs-string">-4865</span><span class="hljs-string">-49196</span><span class="hljs-string">-49200</span><span class="hljs-string">-159</span><span class="hljs-string">-52393</span><span class="hljs-string">-52392</span><span class="hljs-string">-52394</span><span class="hljs-string">-49195</span><span class="hljs-string">-49199</span><span class="hljs-string">-158</span><span class="hljs-string">-49188</span><span class="hljs-string">-49192</span><span class="hljs-string">-107</span><span class="hljs-string">-49187</span><span class="hljs-string">-49191</span><span class="hljs-string">-103</span><span class="hljs-string">-49162</span><span class="hljs-string">-49172</span><span class="hljs-string">-57</span><span class="hljs-string">-49161</span><span class="hljs-string">-49171</span><span class="hljs-string">-51</span><span class="hljs-string">-157</span><span class="hljs-string">-156</span><span class="hljs-string">-61</span><span class="hljs-string">-60</span><span class="hljs-string">-53</span><span class="hljs-string">-47</span><span class="hljs-string">-255</span>        表示TLS客户端支持的加密套件。<br><br>第三个值：0<span class="hljs-string">-11</span><span class="hljs-string">-10</span><span class="hljs-string">-16</span><span class="hljs-string">-22</span><span class="hljs-string">-23</span><span class="hljs-string">-49</span><span class="hljs-string">-13</span><span class="hljs-string">-43</span><span class="hljs-string">-45</span><span class="hljs-string">-51</span><span class="hljs-string">-21</span>    表示支持的 TLS 扩展<br><br>第四个值：29<span class="hljs-string">-23</span><span class="hljs-string">-30</span><span class="hljs-string">-25</span><span class="hljs-string">-24</span>                        表示支持的支持的椭圆曲线（ECC加密算法）<br><br>第五个值：0<span class="hljs-string">-1</span><span class="hljs-string">-2</span>                                 表示支持的椭圆曲线格式<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="1-SSLVersion"><a href="#1-SSLVersion" class="headerlink" title="1.SSLVersion"></a>1.SSLVersion</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">771<br></code></pre></td></tr></table></figure>
+
+<p>将0x0303转换为10进制就是771</p>
+<p><img src="/./../blog_image/image-20231102171445727.png" srcset="/img/loading.gif" lazyload alt="image-20231102171445727"></p>
+<h3 id="2-Cipher"><a href="#2-Cipher" class="headerlink" title="2.Cipher"></a>2.Cipher</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">4866</span>-<span class="hljs-number">4867</span>-<span class="hljs-number">4865</span>-<span class="hljs-number">49196</span>-<span class="hljs-number">49200</span>-<span class="hljs-number">159</span>-<span class="hljs-number">52393</span>-<span class="hljs-number">52392</span>-<span class="hljs-number">52394</span>-<span class="hljs-number">49195</span>-<span class="hljs-number">49199</span>-<span class="hljs-number">158</span>-<span class="hljs-number">49188</span>-<span class="hljs-number">49192</span>-<span class="hljs-number">107</span>-<span class="hljs-number">49187</span>-<span class="hljs-number">49191</span>-<span class="hljs-number">103</span>-<span class="hljs-number">49162</span>-<span class="hljs-number">49172</span>-<span class="hljs-number">57</span>-<span class="hljs-number">49161</span>-<span class="hljs-number">49171</span>-<span class="hljs-number">51</span>-<span class="hljs-number">157</span>-<span class="hljs-number">156</span>-<span class="hljs-number">61</span>-<span class="hljs-number">60</span>-<span class="hljs-number">53</span>-<span class="hljs-number">47</span>-<span class="hljs-number">255</span><br></code></pre></td></tr></table></figure>
+
+<p>将算法套件的十六进制表示，转换成十进制，然后再凭借起来。</p>
+<p><img src="/./../blog_image/image-20231102171555206.png" srcset="/img/loading.gif" lazyload alt="image-20231102171555206"></p>
+<h3 id="3-SSLExtension"><a href="#3-SSLExtension" class="headerlink" title="3.SSLExtension"></a>3.SSLExtension</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">0</span>-<span class="hljs-number">11</span>-<span class="hljs-number">10</span>-<span class="hljs-number">16</span>-<span class="hljs-number">22</span>-<span class="hljs-number">23</span>-<span class="hljs-number">49</span>-<span class="hljs-number">13</span>-<span class="hljs-number">43</span>-<span class="hljs-number">45</span>-<span class="hljs-number">51</span>-<span class="hljs-number">21</span><br></code></pre></td></tr></table></figure>
+
+<p>SSL中所有的扩展对应的数字</p>
+<p><img src="/./../blog_image/image-20231102174433762.png" srcset="/img/loading.gif" lazyload alt="image-20231102174433762"></p>
+<h3 id="4-EllipticCurve"><a href="#4-EllipticCurve" class="headerlink" title="4.EllipticCurve"></a>4.EllipticCurve</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">29</span>-<span class="hljs-number">23</span>-<span class="hljs-number">30</span>-<span class="hljs-number">25</span>-<span class="hljs-number">24</span><br></code></pre></td></tr></table></figure>
+
+<p>将supported_groups对应的十六进制转换成十进制。</p>
+<p><img src="/./../blog_image/image-20231102173836479.png" srcset="/img/loading.gif" lazyload alt="image-20231102173836479"></p>
+<h3 id="5-EllipticCurvePointFormat"><a href="#5-EllipticCurvePointFormat" class="headerlink" title="5.EllipticCurvePointFormat"></a>5.EllipticCurvePointFormat</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">0</span>-<span class="hljs-number">1</span>-<span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<p>将<code>ec_point_formats</code>转换转换十进制。</p>
+<p><img src="/./../blog_image/image-20231102174113014.png" srcset="/img/loading.gif" lazyload alt="image-20231102174113014"></p>
+<h1 id="3-突破指纹"><a href="#3-突破指纹" class="headerlink" title="3.突破指纹"></a>3.突破指纹</h1><p>理解TLS中ja3生成机制后，绕过的思路也就有了：<strong>requests请求时，改变 <code>ja3 string</code>得内容，生成合法的的<code>ja3</code>指纹</strong>。</p>
+<h2 id="3-1-【PY】requests【案例3】"><a href="#3-1-【PY】requests【案例3】" class="headerlink" title="3.1 【PY】requests【案例3】"></a>3.1 【PY】requests【案例3】</h2><p>requests在发送请求时，内部依赖urllib3实现。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">pip</span> install urllib3==<span class="hljs-number">1</span>.<span class="hljs-number">26</span>.<span class="hljs-number">15</span><br><span class="hljs-attribute">pip</span> install urllib3==<span class="hljs-number">1</span>.<span class="hljs-number">26</span>.<span class="hljs-number">16</span><br><span class="hljs-attribute">pip</span> install urllib3==<span class="hljs-number">2</span>.<span class="hljs-number">0</span>.<span class="hljs-number">7</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/./../blog_image/image-20231102182216117.png" srcset="/img/loading.gif" lazyload alt="image-20231102182216117"></p>
+<p>自定义 <code>ciphers</code>实现生成非默认<code>ja3</code></p>
+<p>方式1：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">import</span> urllib3<br><br>urllib3.util.ssl_.DEFAULT_CIPHERS = <span class="hljs-string">&quot;:&quot;</span>.join([<br>    <span class="hljs-comment"># &quot;ECDHE+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;ECDHE+CHACHA20&quot;,</span><br>    <span class="hljs-comment"># &quot;DHE+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;DHE+CHACHA20&quot;,</span><br>    <span class="hljs-comment"># &quot;ECDH+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;DH+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;ECDH+AES&quot;,</span><br>    <span class="hljs-string">&quot;DH+AES&quot;</span>,<br>    <span class="hljs-string">&quot;RSA+AESGCM&quot;</span>,<br>    <span class="hljs-string">&quot;RSA+AES&quot;</span>,<br>    <span class="hljs-string">&quot;!aNULL&quot;</span>,<br>    <span class="hljs-string">&quot;!eNULL&quot;</span>,<br>    <span class="hljs-string">&quot;!MD5&quot;</span>,<br>    <span class="hljs-string">&quot;!DSS&quot;</span>,<br>])<br><br>res = requests.get(<br>    url=<span class="hljs-string">&quot;https://tls.browserleaks.com/json&quot;</span>,<br>    headers=&#123;<br>        <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36&#x27;</span>,<br>    &#125;<br>)<br>res.encoding = <span class="hljs-string">&#x27;utf-8&#x27;</span><br><span class="hljs-built_in">print</span>(res.text)<br><br></code></pre></td></tr></table></figure>
+
+
+
+<p>方式2：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">from</span> requests.adapters <span class="hljs-keyword">import</span> HTTPAdapter<br><span class="hljs-keyword">from</span> requests.packages.urllib3.util.ssl_ <span class="hljs-keyword">import</span> create_urllib3_context<br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">MineAdapter</span>(<span class="hljs-title class_ inherited__">HTTPAdapter</span>):<br>    CIPHERS = <span class="hljs-string">&quot;:&quot;</span>.join(<br>        [<br>            <span class="hljs-string">&quot;ECDHE+AESGCM&quot;</span>,<br>            <span class="hljs-string">&quot;ECDHE+CHACHA20&quot;</span>,<br>            <span class="hljs-string">&quot;DHE+AESGCM&quot;</span>,<br>            <span class="hljs-string">&quot;DHE+CHACHA20&quot;</span>,<br>            <span class="hljs-string">&quot;ECDH+AESGCM&quot;</span>,<br>            <span class="hljs-string">&quot;DH+AESGCM&quot;</span>,<br>            <span class="hljs-string">&quot;ECDH+AES&quot;</span>,<br>            <span class="hljs-string">&quot;DH+AES&quot;</span>,<br>            <span class="hljs-string">&quot;RSA+AESGCM&quot;</span>,<br>            <span class="hljs-string">&quot;RSA+AES&quot;</span>,<br>            <span class="hljs-string">&quot;!aNULL&quot;</span>,<br>            <span class="hljs-string">&quot;!eNULL&quot;</span>,<br>            <span class="hljs-string">&quot;!MD5&quot;</span>,<br>            <span class="hljs-string">&quot;!DSS&quot;</span>,<br>        ]<br>    )<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">init_poolmanager</span>(<span class="hljs-params">self, *args, **kwargs</span>):<br>        context = create_urllib3_context(ciphers=self.CIPHERS)<br>        kwargs[<span class="hljs-string">&#x27;ssl_context&#x27;</span>] = context<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>().init_poolmanager(*args, **kwargs)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">proxy_manager_for</span>(<span class="hljs-params">self, *args, **kwargs</span>):<br>        context = create_urllib3_context(ciphers=self.CIPHERS)<br>        kwargs[<span class="hljs-string">&#x27;ssl_context&#x27;</span>] = context<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>().proxy_manager_for(*args, **kwargs)<br><br><br>session = requests.Session()<br>session.headers.update(&#123;<br>    <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36&#x27;</span>,<br>&#125;)<br>session.mount(<span class="hljs-string">&quot;https://&quot;</span>, MineAdapter())<br><br>res = session.get(<span class="hljs-string">&quot;https://tls.browserleaks.com/json&quot;</span>)<br>res.encoding = <span class="hljs-string">&#x27;utf-8&#x27;</span><br><span class="hljs-built_in">print</span>(res.text)<br></code></pre></td></tr></table></figure>
+
+
+
+<p>用此方法，可以过案例3的TLS校验机制，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">import</span> urllib3<br><br>urllib3.util.ssl_.DEFAULT_CIPHERS = <span class="hljs-string">&quot;:&quot;</span>.join([<br>    <span class="hljs-comment"># &quot;ECDHE+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;ECDHE+CHACHA20&quot;,</span><br>    <span class="hljs-comment"># &quot;DHE+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;DHE+CHACHA20&quot;,</span><br>    <span class="hljs-comment"># &quot;ECDH+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;DH+AESGCM&quot;,</span><br>    <span class="hljs-comment"># &quot;ECDH+AES&quot;,</span><br>    <span class="hljs-string">&quot;DH+AES&quot;</span>,<br>    <span class="hljs-string">&quot;RSA+AESGCM&quot;</span>,<br>    <span class="hljs-string">&quot;RSA+AES&quot;</span>,<br>    <span class="hljs-string">&quot;!aNULL&quot;</span>,<br>    <span class="hljs-string">&quot;!eNULL&quot;</span>,<br>    <span class="hljs-string">&quot;!MD5&quot;</span>,<br>    <span class="hljs-string">&quot;!DSS&quot;</span>,<br>])<br><br>res = requests.get(<br>    url=<span class="hljs-string">&quot;https://match.yuanrenxue.cn/api/match/19?page=1&quot;</span>,<br>    headers=&#123;<br>        <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36&#x27;</span>,<br>    &#125;<br>)<br>res.encoding = <span class="hljs-string">&#x27;utf-8&#x27;</span><br><span class="hljs-built_in">print</span>(res.text)<br><br></code></pre></td></tr></table></figure>
+
+
+
+<p>注意：Python层得TLS是基于底层openssl对外提供的方法，而openssl暴漏给Python只能通过修改 <code>ciphers</code> 来修改ja3指纹，无法支持修改 <code>SSLExtension, EllipticCurve, EllipticCurvePointFormat</code>。</p>
+<h2 id="3-2-【PY】curl-cffi【案例1-2-3】"><a href="#3-2-【PY】curl-cffi【案例1-2-3】" class="headerlink" title="3.2 【PY】curl_cffi【案例1+2+3】"></a>3.2 【PY】curl_cffi【案例1+2+3】</h2><p><a target="_blank" rel="noopener" href="https://pypi.org/project/curl-cffi/#description">https://pypi.org/project/curl-cffi/#description</a></p>
+<ul>
+<li>curl是一个可以发送网络请求的工具。</li>
+<li>curl-impersonate是一个基于curl基础上进行开发的一个工具，可以完美的模拟主流的浏览器。</li>
+<li>curl_cffi，是套壳curl-impersonate，让此工具可以更方便的应用在Python中。</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmake">pip <span class="hljs-keyword">install</span> curl-cffi<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> curl_cffi <span class="hljs-keyword">import</span> requests<br><br>res = requests.get(<br>    <span class="hljs-comment"># url=&quot;https://ascii2d.net/&quot;,</span><br>    <span class="hljs-comment"># url=&quot;https://cn.investing.com/equities/amazon-com-inc-historical-data&quot;,</span><br>    url=<span class="hljs-string">&quot;https://match.yuanrenxue.cn/api/match/19?page=1&quot;</span>,<br>    headers=&#123;<br>        <span class="hljs-string">&#x27;User-Agent&#x27;</span>: <span class="hljs-string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36&#x27;</span>,<br>    &#125;,<br>    impersonate=<span class="hljs-string">&quot;chrome101&quot;</span>,<br>)<br><span class="hljs-built_in">print</span>(res.text)<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-3-【Go】CycleTLS-【案例1-2-3】"><a href="#3-3-【Go】CycleTLS-【案例1-2-3】" class="headerlink" title="3.3 【Go】CycleTLS 【案例1+2+3】"></a>3.3 【Go】CycleTLS 【案例1+2+3】</h2><p>关于Golang环境和基础入门教程可以参考：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk">课件：https:<span class="hljs-regexp">//</span>www.<span class="hljs-number">5</span>xclass.cn<span class="hljs-regexp">/wiki/</span>detail<span class="hljs-regexp">/4/</span><span class="hljs-number">0</span>/<br>视频：https:<span class="hljs-regexp">//</span>www.bilibili.com<span class="hljs-regexp">/video/</span>BV1u5411W79w/<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>github上有一个基于Golang开发的开源模块CycleTLS ，可以更靠近底层去实现定制<code>ja3</code>指纹，直接自定义<code>ja3 fullstring</code>。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Danny-Dasilva/CycleTLS">https://github.com/Danny-Dasilva/CycleTLS</a></p>
+<p><img src="/./../blog_image/image-20231103184851991.png" srcset="/img/loading.gif" lazyload alt="image-20231103184851991"></p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim"><span class="hljs-keyword">go</span> <span class="hljs-built_in">get</span> github.<span class="hljs-keyword">com</span>/Danny-Dasilva/CycleTLS/cycletls <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">&quot;github.com/Danny-Dasilva/CycleTLS/cycletls&quot;</span><br>	<span class="hljs-string">&quot;log&quot;</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br><br>	client := cycletls.Init()<br>	<br>    <span class="hljs-comment">// https://ascii2d.net/</span><br>    <span class="hljs-comment">// https://cn.investing.com/equities/amazon-com-inc-historical-data</span><br>    <span class="hljs-comment">// https://match.yuanrenxue.cn/api/match/19?page=1</span><br>	response, err := client.Do(<span class="hljs-string">&quot;https://tls.browserleaks.com/json&quot;</span>, cycletls.Options&#123;<br>		Body:      <span class="hljs-string">&quot;&quot;</span>,<br>		Ja3:       <span class="hljs-string">&quot;771,4865-4867-4866-49195-49199-52393-52392-49196-49200-49162-49161-49171-49172-51-57-47-53-10,0-23-65281-10-11-35-16-5-51-43-13-45-28-21,29-23-24-25-256-257,0&quot;</span>,<br>		UserAgent: <span class="hljs-string">&quot;Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0&quot;</span>,<br>	&#125;, <span class="hljs-string">&quot;GET&quot;</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Print(<span class="hljs-string">&quot;Request Failed: &quot;</span> + err.Error())<br>	&#125;<br>	log.Println(response)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E7%88%AC%E8%99%AB/golang%E5%BC%80%E5%8F%91/" class="category-chain-item">golang开发</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%88%AC%E8%99%AB/" class="print-no-link">#爬虫</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>tls指纹绕过</div>
+      <div>https://pow1e.github.io/2023/12/02/tls指纹绕过/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>pow1e</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/12/02/validator%E5%AE%9E%E7%8E%B0%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" title="validator实现参数校验">
+                        <span class="hidden-mobile">validator实现参数校验</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
