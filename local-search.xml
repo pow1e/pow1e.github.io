@@ -13,8 +13,6 @@
     
     <categories>
       
-      <category>java安全</category>
-      
       <category>代码审计</category>
       
     </categories>
@@ -23,6 +21,8 @@
     <tags>
       
       <tag>java安全</tag>
+      
+      <tag>代码审计</tag>
       
     </tags>
     
