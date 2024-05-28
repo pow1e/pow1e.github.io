@@ -224,13 +224,509 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/04/26/Ruoyi%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
+        <a href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc6%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+          cc6调用链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc6%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+        <div>
+          0x01 写在前面：cc6和cc1的不同之处，其中cc6对于jdk版本不敏感，即任意jdk版本都可以调用。（cc1需要jdk1.8.65，以及Commons-Collections 3.2.1） cc6的前半段和cc1的lazyMap调用链是一样的。 cc6可以说是  cc6 &#x3D; cc1 + URLDNS  cc6可以非常常用，因为它主要是依赖于hashCode，map的get方法等基础
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-28 10:11" pubdate>
+              2024-05-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc4%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+          cc4调用链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc4%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+        <div>
+          环境配置： Commons-Collections 4.0 jdk8u65  maven中导入坐标： 12345&lt;dependency&gt;   &lt;groupId&gt;org.apache.commons&lt;/groupId&gt;   &lt;artifactId&gt;commons-collections4&lt;/artifactId&gt;   &lt;version
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-28 10:11" pubdate>
+              2024-05-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc3%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+          cc3调用链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc3%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+        <div>
+          环境： jdk8u65 Commons-Collections 3.2.1  导入maven坐标： 12345&lt;dependency&gt;    &lt;groupId&gt;commons-collections&lt;/groupId&gt;    &lt;artifactId&gt;commons-collections&lt;/artifactId&gt;    &lt;versi
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-28 10:10" pubdate>
+              2024-05-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc2%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+          cc2调用链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/cc%E9%93%BE/cc2%E8%B0%83%E7%94%A8%E9%93%BE/" target="_self">
+        <div>
+          环境配置： Commons-Collections 4.0 jdk8u65  maven中导入坐标： 12345&lt;dependency&gt;   &lt;groupId&gt;org.apache.commons&lt;/groupId&gt;   &lt;artifactId&gt;commons-collections4&lt;/artifactId&gt;   &lt;version
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-28 10:10" pubdate>
+              2024-05-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/shiro/shiro-%E6%9C%AA%E6%8E%88%E6%9D%83/" target="_self">
+          shiro-未授权
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/shiro/shiro-%E6%9C%AA%E6%8E%88%E6%9D%83/" target="_self">
+        <div>
+          shiro 1.4.1简述：主要是通过/请求路径/即可实现bypass，越权访问。 适用范围： 版本&lt;&#x3D;1.4.1 poc：    shiro配置 请求资源路径 bypass路径 说明    map.put(“&#x2F;admin”,”auth”) &#x2F;admin &#x2F;admin&#x2F; /admin路径需要登陆才可以访问，但是使用/admin/可以绕过，因为
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-28 09:45" pubdate>
+              2024-05-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+              <a href="/tags/shiro/">#shiro</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/05/01/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201268/" target="_self">
+          fastjson 反序列化基础四(1.2.68)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/05/01/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201268/" target="_self">
+        <div>
+          0x01 环境搭建以及漏洞简述：1234567&lt;dependencies&gt;    &lt;dependency&gt;        &lt;groupId&gt;com.alibaba&lt;/groupId&gt;        &lt;artifactId&gt;fastjson&lt;/artifactId&gt;        &lt;version&gt;1.2.68&lt
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-01 09:48" pubdate>
+              2024-05-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+              <a href="/tags/fastjson/">#fastjson</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/04/29/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201262-1268/" target="_self">
+          fastjson 反序列化基础三(1.2.62-1.2.68)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/29/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201262-1268/" target="_self">
+        <div>
+          前言：主要是跟着师傅学习，看这个1.2.62 - 1.2.68版本是如何绕过黑名单的，以及有什么好玩的利用链。 1.2.62 绕过黑名单：Exp编写：前提条件：  服务端上版本是&lt;=1.2.63的 低版本jdk（主要是利用了jdni注入，高版本的jndi注入会受到限制，关于这部分可以看[Fastjson系列五——高版本JDK绕过及检测与防御  Mi1k7ea ]） 开启了AutoType 目
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-04-29 09:48" pubdate>
+              2024-04-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+              <a href="/tags/fastjson/">#fastjson</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/04/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201225-1261/" target="_self">
+          fastjson 反序列化基础二(1.2.25-1.2.61)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201225-1261/" target="_self">
+        <div>
+          1. 分析fastjson1.2.25的修复：checkAutoType()函数:首先看fastjson1.2.25如何修复1.2.24版本的漏洞的： 1.2.24版本的DefaultJSONParser#parseObject：  直接调用TypeUtils#loadClass直接加载类。 而再看1.2.25版本的DefaultJSONParser#parseObject：  如果当前key是@
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-04-28 09:48" pubdate>
+              2024-04-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
+            
+              <a href="/tags/fastjson/">#fastjson</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/04/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/Ruoyi%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
           Ruoyi代码审计
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/26/Ruoyi%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/Ruoyi%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
         <div>
           搭建环境：1git clone https://gitee.com/y_project/RuoYi.git    本次的ruoyi版本为4.0。 使用git checkout [版本号]进行版本切换。 使用git tag可以查看很多版本列表 审计过程：1. shiro组件：1.1 爆破shiro密码： 点击检测当前密钥后再点击爆破密码就会自动执行shiro密码爆破。 1.2 执行命令：执行shir
         </div>
@@ -287,13 +783,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2024/04/21/fastjson-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80%E4%B8%80-1-2-24/" target="_self">
+        <a href="/2024/04/21/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson-1224/" target="_self">
           fastjson 反序列化基础一(1.2.24)
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/21/fastjson-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%9F%BA%E7%A1%80%E4%B8%80-1-2-24/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/21/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson-1224/" target="_self">
         <div>
           0x01 基本使用：编写一个实体类： 123456789101112131415161718192021222324252627282930package com.hme.entity;public class Student &#123;    private String name;    private int age;    public Student() &#123;        S
         </div>
@@ -339,474 +835,6 @@
               <a href="/tags/fastjson/">#fastjson</a>
             
           </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/04/21/shiro550/" target="_self">
-          shiro550
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/21/shiro550/" target="_self">
-        <div>
-          环境配置：https://codeload.github.com/apache/shiro/zip/shiro-root-1.2.4 在samples目录下的web目录，才是我们需要复现的环境。 将jstl版本改成1.2  shiro版本：1.2.4 复现：访问页面抓包： localhost:8081&#x2F;login.jsp后点击记住我： 返回数据包：  之后我们的后端就根据这个cookie
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-04-21 13:39" pubdate>
-              2024-04-21
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
-            
-              <a href="/tags/shiro/">#shiro</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/04/15/Tmail%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
-          Tmail代码审计
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/04/15/Tmail%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
-        <div>
-          配置环境：前台：1.xss：前台搜索xss：访问:vps:8088/tmall/前台服务，搜索处存在xss。  用户信息修改xss： 提交后，后台管理处可以弹出xss。  之后我们可以利用xss接受平台接受信息。 不会利用。 2.文件上传：用户个人信息修改中存在任意文件上传。 上传后的文件路径在： /tmall/res/images/item/userProfilePicture/文件名目录下
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-04-15 17:23" pubdate>
-              2024-04-15
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" class="category-chain-item">代码审计</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
-            
-              <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">#代码审计</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/03/17/FEBS%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
-          FEBS后台管理系统代码审计
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/17/FEBS%E5%90%8E%E5%8F%B0%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" target="_self">
-        <div>
-          环境准备：下载源码：下载文件jackliu-hao&#x2F;shiro_boot—-: shiro_boot代码审计 (github.com) Oracle安装：1docker run -it -p 1521:1521 \--name oracle11g \registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g   进入容器docker exec
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-03-17 11:33" pubdate>
-              2024-03-17
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" class="category-chain-item">代码审计</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/java%E5%AE%89%E5%85%A8/">#java安全</a>
-            
-              <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">#代码审计</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/12/26/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0RCE/" target="_self">
-          minio从信息泄漏到RCE
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/12/26/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0RCE/" target="_self">
-        <div>
-          写在前面：Minio 是个基于 Golang 编写的开源对象存储套件，虽然轻量，却拥有着不错的性能。 minio存在漏洞利用，本次漏洞为CVE-2023-28432。 官方在 https://github.com/minio/minio/pull/8550 中引入bootstrap API 并于 RELEASE.2019-12-17T23-16-33Z发布，用于验证服务器配置。在其RELEASE.
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-12-26 21:52" pubdate>
-              2023-12-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%AE%89%E5%85%A8/" class="category-chain-item">云原生安全</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/minio/">#minio</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/12/08/logrus%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%8E%A8%E9%80%81/" target="_self">
-          logrus实现日志推送
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/12/08/logrus%E5%AE%9E%E7%8E%B0%E6%97%A5%E5%BF%97%E6%8E%A8%E9%80%81/" target="_self">
-        <div>
-          1.logrus介绍：导入包： 1go get -u github.com/sirupsen/logrus    1.1 logrus基础配置：12345678910111213141516171819202122232425var LogrusObj *logrus.Loggerfunc InitLog() &#123;    if LogrusObj != nil &#123;       f
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-12-08 13:27" pubdate>
-              2023-12-08
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/golang%E5%BC%80%E5%8F%91/" class="category-chain-item">golang开发</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/golang/">#golang</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/12/02/tls%E6%8C%87%E7%BA%B9%E7%BB%95%E8%BF%87/" target="_self">
-          tls指纹绕过
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/12/02/tls%E6%8C%87%E7%BA%B9%E7%BB%95%E8%BF%87/" target="_self">
-        <div>
-          浏览器可以正常访问，但是用requests发送请求失败。 后端是如何监测得呢？为什么浏览器可以返回结果，而requests模块不行呢？ https://cn.investing.com/equities/amazon-com-inc-historical-data   1.指纹校验案例1.1 案例：ascii2dhttps://ascii2d.net/   1234567import reques
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-12-02 23:42" pubdate>
-              2023-12-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E7%88%AC%E8%99%AB/" class="category-chain-item">爬虫</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E7%88%AC%E8%99%AB/">#爬虫</a>
-            
-              <a href="/tags/golang%E5%BC%80%E5%8F%91/">#golang开发</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/12/02/validator%E5%AE%9E%E7%8E%B0%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" target="_self">
-          validator实现参数校验
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/12/02/validator%E5%AE%9E%E7%8E%B0%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" target="_self">
-        <div>
-          一.导入包：1go get github.com/go-playground/validator/v10    二.基本语法：   标记 标记说明 例    required 必填 Field或Struct validate:&quot;required&quot;   omitempty 空时忽略 Field或Struct validate:&quot;omitempty&quot;   len
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-12-02 23:33" pubdate>
-              2023-12-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/golang%E5%BC%80%E5%8F%91/" class="category-chain-item">golang开发</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/golang/">#golang</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/10/27/cc1%E8%B0%83%E7%94%A8%E9%93%BE2/" target="_self">
-          cc1调用链2
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/10/27/cc1%E8%B0%83%E7%94%A8%E9%93%BE2/" target="_self">
-        <div>
-          
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-10-27 09:44" pubdate>
-              2023-10-27
-            </time>
-          </div>
-        
-        
         
       </div>
     </article>

